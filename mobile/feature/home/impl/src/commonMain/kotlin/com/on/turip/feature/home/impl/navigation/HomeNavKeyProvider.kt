@@ -7,6 +7,8 @@ import com.on.turip.core.navigation.Navigator
 import com.on.turip.feature.home.api.HomeNavKey
 import com.on.turip.feature.home.impl.HomeScreen
 import com.on.turip.feature.login.api.LoginNavKey
+import com.on.turip.feature.popularregion.api.PopularRegionNavKey
+import com.on.turip.feature.randomtravel.api.RandomTravelNavKey
 import com.on.turip.feature.search.api.RegionResultNavKey
 import com.on.turip.feature.search.api.SearchNavKey
 import com.on.turip.feature.trip.api.TripDetailNavKey
@@ -23,6 +25,8 @@ class HomeNavKeyProvider : NavKeyProvider {
                 onSearchClick = { keyword -> navigator.navigate(SearchNavKey(keyword)) },
                 onRegionClick = { regionName -> navigator.navigate(RegionResultNavKey(regionName)) },
                 onContentClick = { contentId -> navigator.navigate(TripDetailNavKey(contentId)) },
+                onRandomTravelClick = { navigator.navigate(RandomTravelNavKey) },
+                onPopularRegionClick = { navigator.navigate(PopularRegionNavKey) },
                 onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey()) },
             )
         }

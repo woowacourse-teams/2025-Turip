@@ -1,6 +1,7 @@
 package com.on.turip.feature.trip.impl.model
 
 import androidx.compose.runtime.Stable
+import com.on.turip.core.ui.model.AppleMap
 
 @Stable
 data class PlaceModel(
@@ -10,8 +11,13 @@ data class PlaceModel(
     val timeLine: String,
     private val category: String,
     private val mapLink: String,
+    private val appleMap: AppleMap,
 ) {
-    val mapModel: MapModel = MapModel.from(mapLink)
+    val mapModel: MapModel =
+        MapModel.from(
+            url = mapLink,
+            appleMap = appleMap,
+        )
     val turipCategory: String
         get() {
             val findIndex: Int = category.indexOfLast { it == '>' }

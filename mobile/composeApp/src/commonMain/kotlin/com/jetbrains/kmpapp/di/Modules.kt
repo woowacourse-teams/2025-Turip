@@ -12,6 +12,9 @@ import com.on.turip.feature.invitation.impl.di.invitationModule
 import com.on.turip.feature.login.impl.di.loginModule
 import com.on.turip.feature.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.feature.mypage.impl.di.myPageModule
+import com.on.turip.feature.popularregion.impl.di.popularRegionModule
+import com.on.turip.feature.randomtravel.impl.di.randomTravelModule
+import com.on.turip.feature.regionbriefing.impl.di.regionBriefingModule
 import com.on.turip.feature.search.impl.di.searchModule
 import com.on.turip.feature.splash.impl.di.splashModule
 import com.on.turip.feature.trip.impl.di.tripModule
@@ -43,6 +46,9 @@ val featureModule =
             bookmarkModule,
             myPageModule,
             searchModule,
+            randomTravelModule,
+            popularRegionModule,
+            regionBriefingModule,
             myTuripModule,
             turipDetailModule,
             tripModule(BuildKonfig.BASE_URL),

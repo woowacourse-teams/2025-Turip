@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,18 +31,25 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.component.TuripLoadingIndicator
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.all_close_description
+import com.on.turip.core.designsystem.generated.resources.home_random_travel_unavailable
 import com.on.turip.core.designsystem.generated.resources.home_top_title
 import com.on.turip.core.designsystem.generated.resources.home_users_like_content_title
+import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.feature.home.impl.component.HomeAppBar
+import com.on.turip.feature.home.impl.component.PopularRegionCtaButton
+import com.on.turip.feature.home.impl.component.RandomTravelCtaButton
 import com.on.turip.feature.home.impl.component.RegionList
 import com.on.turip.feature.home.impl.component.RegionTypeButtons
 import com.on.turip.feature.home.impl.component.SearchTextField
 import com.on.turip.feature.home.impl.component.UsersLikeList
+import com.on.turip.feature.home.impl.model.PopularDestinationModel
 import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -50,16 +58,33 @@ fun HomeScreen(
     onSearchClick: (keyword: String) -> Unit,
     onRegionClick: (regionName: String) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
+    onRandomTravelClick: () -> Unit,
+    onPopularRegionClick: () -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsState()
+    val snackbarDelegate = LocalSnackbarDelegate.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                HomeUiEffect.NavigateToLogin -> onNavigateToLoginScreen()
+                HomeUiEffect.NavigateToLogin -> {
+                    onNavigateToLoginScreen()
+                }
+
+                HomeUiEffect.NavigateToRandomTravel -> {
+                    onRandomTravelClick()
+                }
+
+                HomeUiEffect.ShowRandomTravelUnavailable -> {
+                    snackbarDelegate.showSnackbar(
+                        message = getString(Res.string.home_random_travel_unavailable),
+                        actionLabel = getString(Res.string.all_close_description),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
             }
         }
     }
@@ -82,6 +107,8 @@ fun HomeScreen(
             },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
+            onRandomTravelClick = viewModel::clickRandomTravel,
+            onPopularRegionClick = onPopularRegionClick,
         )
     }
 }
@@ -94,6 +121,8 @@ private fun HomeScreenContent(
     onContentClick: (usersLikeContentModel: UsersLikeContentModel) -> Unit,
     onRegionClick: (regionName: String) -> Unit,
     onDomesticClick: (isDomestic: Boolean) -> Unit,
+    onRandomTravelClick: () -> Unit,
+    onPopularRegionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -152,6 +181,11 @@ private fun HomeScreenContent(
                             .padding(top = TuripTheme.spacing.extraSmall),
                 )
 
+                RandomTravelCtaButton(
+                    onClick = onRandomTravelClick,
+                    modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
+                )
+
                 Text(
                     text = stringResource(Res.string.home_users_like_content_title),
                     modifier = Modifier.padding(top = TuripTheme.spacing.medium),
@@ -162,6 +196,11 @@ private fun HomeScreenContent(
                 UsersLikeList(
                     usersLikeContents = uiState.usersLikeContents,
                     onContentClick = onContentClick,
+                )
+
+                PopularRegionCtaButton(
+                    destinations = uiState.popularDestinations,
+                    onClick = onPopularRegionClick,
                 )
 
                 RegionTypeButtons(
@@ -192,6 +231,8 @@ private fun HomeLoadingPreview() {
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -208,6 +249,11 @@ private fun HomeSuccessPreview() {
             isDomesticSelected = true,
             usersLikeContents = emptyList(),
             errorUiState = ErrorUiState.None,
+            popularDestinations =
+                listOf(
+                    PopularDestinationModel(rank = 1, regionCategoryName = "서울", visitorCountText = "2847만"),
+                    PopularDestinationModel(rank = 2, regionCategoryName = "부산", visitorCountText = "1204만"),
+                ),
         )
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
@@ -218,6 +264,8 @@ private fun HomeSuccessPreview() {
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -237,6 +285,8 @@ private fun HomeServerErrorPreview() {
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -256,6 +306,8 @@ private fun HomeNetworkErrorPreview() {
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
