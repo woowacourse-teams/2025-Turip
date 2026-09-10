@@ -45,18 +45,17 @@ public class RegionCategoryService {
     private List<RegionCategoryResponse> findDomesticRegionCategories() {
         List<City> cities = cityService.findCitiesByCountryName(KOREA_COUNTRY_NAME);
 
-        List<RegionCategoryResponse> results = findSupportedCitiesWithContent(cities);
+        List<RegionCategoryResponse> results = findSupportedCities(cities);
 
-        addDomesticEtcCategoryIfHasContent(cities, results);
+        addDomesticEtcCategory(results);
 
         return results;
     }
 
-    private List<RegionCategoryResponse> findSupportedCitiesWithContent(List<City> cities) {
+    private List<RegionCategoryResponse> findSupportedCities(List<City> cities) {
         return cities.stream()
                 .filter(this::isSupportedDomesticCity)
                 .map(this::createCityWithContentCount)
-                .filter(cityWithCount -> cityWithCount.contentCount() > 0)
                 .sorted(Comparator.comparing(CityWithContentCount::contentCount).reversed())
                 .map(cityWithCount -> createRegionCategoryResponseWithImage(cityWithCount.city()))
                 .collect(Collectors.toList());
@@ -80,20 +79,8 @@ public class RegionCategoryService {
         return new CityWithContentCount(city, contentCount);
     }
 
-    private void addDomesticEtcCategoryIfHasContent(List<City> cities, List<RegionCategoryResponse> results) {
-        List<String> supportedCityNames = getSupportedCityNames(cities);
-        int domesticEtcCount = contentRepository.countDomesticEtcContents(supportedCityNames);
-
-        if (domesticEtcCount > 0) {
-            results.add(RegionCategoryResponse.of(DOMESTIC_ETC_NAME, domesticEtcImageUrl));
-        }
-    }
-
-    private List<String> getSupportedCityNames(List<City> cities) {
-        return cities.stream()
-                .filter(this::isSupportedDomesticCity)
-                .map(City::getName)
-                .collect(Collectors.toList());
+    private void addDomesticEtcCategory(List<RegionCategoryResponse> results) {
+        results.add(RegionCategoryResponse.of(DOMESTIC_ETC_NAME, domesticEtcImageUrl));
     }
 
     private List<RegionCategoryResponse> findOverseasRegionCategories() {
