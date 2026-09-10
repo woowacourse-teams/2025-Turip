@@ -269,9 +269,15 @@ class PopularRegionViewModel(
     }
 
     private fun navigateToRelatedContents() {
-        val regionCategoryName: String =
-            currentState.selectedRegion?.regionCategoryName ?: return
-        emitEffect(PopularRegionEffect.NavigateToRegionResult(regionCategoryName))
+        val region: PopularRegionModel = currentState.selectedRegion ?: return
+        val regionCategoryName: String = region.regionCategoryName ?: return
+        emitEffect(
+            PopularRegionEffect.NavigateToRegionBriefing(
+                regionCategoryName = regionCategoryName,
+                visitorCount = region.visitorCount,
+                baseMonth = currentState.baseMonth,
+            ),
+        )
     }
 
     private fun handleLoadError(failure: TuripResult.Failure) {

@@ -57,7 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PopularRegionScreen(
     onBackClick: () -> Unit,
-    onRegionContentsClick: (regionCategoryName: String) -> Unit,
+    onRegionBriefingClick: (regionCategoryName: String, visitorCount: Long, baseMonth: String?) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,8 +68,12 @@ fun PopularRegionScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect: PopularRegionEffect ->
             when (effect) {
-                is PopularRegionEffect.NavigateToRegionResult ->
-                    onRegionContentsClick(effect.regionCategoryName)
+                is PopularRegionEffect.NavigateToRegionBriefing ->
+                    onRegionBriefingClick(
+                        effect.regionCategoryName,
+                        effect.visitorCount,
+                        effect.baseMonth,
+                    )
 
                 is PopularRegionEffect.NavigateToTripDetail ->
                     onContentClick(effect.contentId)
