@@ -61,6 +61,11 @@ region:
       etc:
         image-url: https://test.example.com/overseas-etc.jpg
 
+# Article 기본 썸네일 설정 (테스트용 더미 값)
+turip:
+  article:
+    default-thumbnail-url: https://test.example.com/article-default-thumbnail.jpg
+
 invitation:
   jwt:
     secret-key: turip-test-invitation-jwt-secret-key-for-testing-purposes
