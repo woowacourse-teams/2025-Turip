@@ -1,7 +1,8 @@
-package com.on.turip.feature.randomtravel.impl.component
+package com.on.turip.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,11 +25,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.Res
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_count
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_more_description
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_count
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_more_description
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.model.region.RelatedSpotModel
 import com.on.turip.core.ui.util.formatResource
-import com.on.turip.feature.randomtravel.impl.model.RandomTravelRelatedSpotModel
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
@@ -39,8 +40,8 @@ import org.jetbrains.compose.resources.stringResource
  * 왼쪽 고정폭 라벨 · 세로 구분선 · 본문(대표 장소 + 나머지) · 오른쪽 개수 칩.
  */
 @Composable
-internal fun RandomTravelRelatedSpotItem(
-    relatedSpot: RandomTravelRelatedSpotModel,
+fun RelatedSpotItem(
+    relatedSpot: RelatedSpotModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -84,16 +85,17 @@ internal fun RandomTravelRelatedSpotItem(
                 overflow = TextOverflow.Ellipsis,
             )
 
-            if (relatedSpot.hasRemainSpots) {
-                Text(
-                    text = relatedSpot.remainSpots,
-                    style = TuripTheme.typography.info1,
-                    color = TuripTheme.colors.gray03,
-                    maxLines = REMAIN_SPOTS_MAX_LINES,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
-                )
-            }
+            // 나머지 장소가 한 줄이거나 아예 없어도 두 줄 자리를 그대로 비워 둔다.
+            // 카드 높이가 장소 수에 따라 들쭉날쭉하면 목록이 계단처럼 보인다.
+            Text(
+                text = relatedSpot.remainSpots,
+                style = TuripTheme.typography.info1,
+                color = TuripTheme.colors.gray03,
+                minLines = REMAIN_SPOTS_LINES,
+                maxLines = REMAIN_SPOTS_LINES,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
+            )
         }
 
         Surface(
@@ -103,7 +105,7 @@ internal fun RandomTravelRelatedSpotItem(
         ) {
             Text(
                 text =
-                    stringResource(Res.string.random_travel_related_spot_count)
+                    stringResource(Res.string.briefing_related_spot_count)
                         .formatResource(relatedSpot.spots.size),
                 style = TuripTheme.typography.info1,
                 color = TuripTheme.colors.gray05,
@@ -118,7 +120,7 @@ internal fun RandomTravelRelatedSpotItem(
 
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = stringResource(Res.string.random_travel_related_spot_more_description),
+            contentDescription = stringResource(Res.string.briefing_related_spot_more_description),
             tint = TuripTheme.colors.gray02,
             modifier = Modifier.size(CHEVRON_SIZE),
         )
@@ -129,27 +131,48 @@ private val CATEGORY_LABEL_WIDTH = 46.dp
 private val DIVIDER_WIDTH = 1.dp
 private val DIVIDER_HEIGHT = 32.dp
 private val CHEVRON_SIZE = 20.dp
-private const val REMAIN_SPOTS_MAX_LINES: Int = 2
+private const val REMAIN_SPOTS_LINES: Int = 2
 
+/** 장소 수와 무관하게 카드 높이가 같은지 보려고 세 가지를 나란히 둔다. */
 @Preview(showBackground = true, name = "연관 관광지 카드")
 @Composable
-private fun RandomTravelRelatedSpotItemPreview() {
+private fun RelatedSpotItemPreview() {
     TuripTheme {
-        RandomTravelRelatedSpotItem(
-            relatedSpot =
-                RandomTravelRelatedSpotModel(
-                    category = "관광지",
-                    spots =
-                        persistentListOf(
-                            "종묘",
-                            "북촌한옥마을",
-                            "광장시장",
-                            "남산케이블카",
-                            "국립중앙박물관",
-                            "청계천",
-                        ),
-                ),
-            onClick = {},
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large)) {
+            RelatedSpotItem(
+                relatedSpot =
+                    RelatedSpotModel(
+                        category = "관광지",
+                        spots =
+                            persistentListOf(
+                                "종묘",
+                                "북촌한옥마을",
+                                "광장시장",
+                                "남산케이블카",
+                                "국립중앙박물관",
+                                "청계천",
+                            ),
+                    ),
+                onClick = {},
+            )
+
+            RelatedSpotItem(
+                relatedSpot =
+                    RelatedSpotModel(
+                        category = "숙박",
+                        spots = persistentListOf("롯데호텔", "호텔국도"),
+                    ),
+                onClick = {},
+            )
+
+            RelatedSpotItem(
+                relatedSpot =
+                    RelatedSpotModel(
+                        category = "음식",
+                        spots = persistentListOf("토속촌삼계탕"),
+                    ),
+                onClick = {},
+            )
+        }
     }
 }

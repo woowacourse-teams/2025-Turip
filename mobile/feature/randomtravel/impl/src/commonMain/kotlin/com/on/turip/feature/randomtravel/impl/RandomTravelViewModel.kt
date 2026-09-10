@@ -16,7 +16,10 @@ import com.on.turip.core.ui.BaseViewModel
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
 import com.on.turip.core.ui.error.toUiError
+import com.on.turip.core.ui.model.content.toVideoSummaryModel
 import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
+import com.on.turip.core.ui.model.region.RelatedSpotsUiState
+import com.on.turip.core.ui.model.region.toRelatedSpotModel
 import com.on.turip.core.ui.model.turip.TuripEditModel
 import com.on.turip.feature.randomtravel.impl.model.RandomDestinationModel
 import com.on.turip.feature.randomtravel.impl.model.TuripDraftPlaceModel
@@ -230,7 +233,7 @@ class RandomTravelViewModel(
                         updateState {
                             copy(
                                 videos = result.value.videos
-                                    .map { it.toUiModel() }
+                                    .map { it.toVideoSummaryModel() }
                                     .toImmutableList(),
                                 isBriefingLoading = false,
                                 isBriefingFetched = true,
@@ -273,7 +276,7 @@ class RandomTravelViewModel(
                     is TuripResult.Success -> {
                         updateState {
                             copy(
-                                videos = (videos + result.value.videos.map { it.toUiModel() }).toImmutableList(),
+                                videos = (videos + result.value.videos.map { it.toVideoSummaryModel() }).toImmutableList(),
                                 isVideoListLoadable = result.value.loadable,
                                 isLoadingMoreVideos = false,
                             )
@@ -306,7 +309,7 @@ class RandomTravelViewModel(
                             Napier.d("랜덤 여행 - 연관 관광지 ${result.value.size}개 카테고리 로드")
                             RelatedSpotsUiState.Success(
                                 result.value
-                                    .map { it.toUiModel() }
+                                    .map { it.toRelatedSpotModel() }
                                     .toImmutableList(),
                             )
                         }

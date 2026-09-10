@@ -40,11 +40,13 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.feature.home.impl.component.HomeAppBar
+import com.on.turip.feature.home.impl.component.PopularRegionCtaButton
 import com.on.turip.feature.home.impl.component.RandomTravelCtaButton
 import com.on.turip.feature.home.impl.component.RegionList
 import com.on.turip.feature.home.impl.component.RegionTypeButtons
 import com.on.turip.feature.home.impl.component.SearchTextField
 import com.on.turip.feature.home.impl.component.UsersLikeList
+import com.on.turip.feature.home.impl.model.PopularDestinationModel
 import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
@@ -57,6 +59,7 @@ fun HomeScreen(
     onRegionClick: (regionName: String) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
     onRandomTravelClick: () -> Unit,
+    onPopularRegionClick: () -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
@@ -105,6 +108,7 @@ fun HomeScreen(
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
             onRandomTravelClick = viewModel::clickRandomTravel,
+            onPopularRegionClick = onPopularRegionClick,
         )
     }
 }
@@ -118,6 +122,7 @@ private fun HomeScreenContent(
     onRegionClick: (regionName: String) -> Unit,
     onDomesticClick: (isDomestic: Boolean) -> Unit,
     onRandomTravelClick: () -> Unit,
+    onPopularRegionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -193,6 +198,11 @@ private fun HomeScreenContent(
                     onContentClick = onContentClick,
                 )
 
+                PopularRegionCtaButton(
+                    destinations = uiState.popularDestinations,
+                    onClick = onPopularRegionClick,
+                )
+
                 RegionTypeButtons(
                     onDomesticClick = { onDomesticClick(it) },
                     isSelectedDomestic = uiState.isDomesticSelected,
@@ -222,6 +232,7 @@ private fun HomeLoadingPreview() {
                 onRegionClick = {},
                 onDomesticClick = {},
                 onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -238,6 +249,11 @@ private fun HomeSuccessPreview() {
             isDomesticSelected = true,
             usersLikeContents = emptyList(),
             errorUiState = ErrorUiState.None,
+            popularDestinations =
+                listOf(
+                    PopularDestinationModel(rank = 1, regionCategoryName = "서울", visitorCountText = "2847만"),
+                    PopularDestinationModel(rank = 2, regionCategoryName = "부산", visitorCountText = "1204만"),
+                ),
         )
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
@@ -249,6 +265,7 @@ private fun HomeSuccessPreview() {
                 onRegionClick = {},
                 onDomesticClick = {},
                 onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -269,6 +286,7 @@ private fun HomeServerErrorPreview() {
                 onRegionClick = {},
                 onDomesticClick = {},
                 onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -289,6 +307,7 @@ private fun HomeNetworkErrorPreview() {
                 onRegionClick = {},
                 onDomesticClick = {},
                 onRandomTravelClick = {},
+                onPopularRegionClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }

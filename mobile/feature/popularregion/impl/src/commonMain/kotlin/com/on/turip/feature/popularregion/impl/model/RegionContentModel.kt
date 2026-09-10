@@ -1,17 +1,18 @@
-package com.on.turip.feature.randomtravel.impl.model
+package com.on.turip.feature.popularregion.impl.model
 
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class RandomTravelVideoModel(
+data class RegionContentModel(
     val contentId: Long,
     val title: String,
     val thumbnailUrl: String,
-    val channelName: String,
-    val profileImageUrl: String,
+    val creatorName: String,
     val uploadedDate: String,
-    val cityName: String,
     val nights: Int,
     val days: Int,
     val placeCount: Int,
-)
+    val isBookmarked: Boolean,
+) {
+    val isDayTrip: Boolean = nights == 0
+}

@@ -1,4 +1,4 @@
-package com.on.turip.feature.randomtravel.impl.component
+package com.on.turip.core.ui.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -33,12 +32,12 @@ import com.on.turip.core.designsystem.generated.resources.all_total_place_count
 import com.on.turip.core.designsystem.generated.resources.all_trip_day_trip_duration
 import com.on.turip.core.designsystem.generated.resources.all_trip_duration
 import com.on.turip.core.designsystem.generated.resources.all_video_description
+import com.on.turip.core.designsystem.generated.resources.briefing_selected_video
 import com.on.turip.core.designsystem.generated.resources.ic_calendar
 import com.on.turip.core.designsystem.generated.resources.ic_location
-import com.on.turip.core.designsystem.generated.resources.random_travel_selected_video
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.model.content.VideoSummaryModel
 import com.on.turip.core.ui.util.formatResource
-import com.on.turip.feature.randomtravel.impl.model.RandomTravelVideoModel
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -46,14 +45,15 @@ import org.jetbrains.compose.resources.stringResource
 /**
  * 브리핑 본문의 영상 카드.
  *
- * 탭하면 선택 상태가 되고, 선택된 영상이 `이 여행 시작하기`의 대상이 된다.
+ * [isSelected] 는 고른 영상을 다음 단계로 넘기는 화면(랜덤 여행)에서만 쓴다.
+ * 탭이 곧 이동인 화면은 기본값 그대로 두면 선택 표시가 나오지 않는다.
  */
 @Composable
-internal fun RandomTravelVideoItem(
-    video: RandomTravelVideoModel,
-    isSelected: Boolean,
+fun VideoSummaryItem(
+    video: VideoSummaryModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
 ) {
     val itemShape = TuripTheme.shape.wideButton
     val borderColor: Color by animateColorAsState(
@@ -120,7 +120,7 @@ internal fun RandomTravelVideoItem(
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = stringResource(Res.string.random_travel_selected_video),
+                    contentDescription = stringResource(Res.string.briefing_selected_video),
                     tint = TuripTheme.colors.primary,
                     modifier =
                         Modifier
@@ -190,7 +190,7 @@ internal fun RandomTravelVideoItem(
 }
 
 @Composable
-private fun RandomTravelVideoModel.durationText(): String =
+private fun VideoSummaryModel.durationText(): String =
     if (nights == 0) {
         stringResource(Res.string.all_trip_day_trip_duration)
     } else {
