@@ -24,9 +24,13 @@ class ArticleDetailViewModel(
 
     override fun onIntent(intent: ArticleDetailIntent) {
         when (intent) {
-            ArticleDetailIntent.Retry -> loadArticle()
-            is ArticleDetailIntent.ClickPlaceMap ->
+            ArticleDetailIntent.Retry -> {
+                loadArticle()
+            }
+
+            is ArticleDetailIntent.ClickPlaceMap -> {
                 emitEffect(ArticleDetailEffect.OpenMap(intent.place.mapUrl))
+            }
         }
     }
 
@@ -46,7 +50,10 @@ class ArticleDetailViewModel(
                 updateState { copy(isLoading = true, errorUiState = ErrorUiState.None) }
 
                 when (val result = articleRepository.loadArticleDetail(articleId)) {
-                    is TuripResult.Success -> handleLoadSuccess(result.value)
+                    is TuripResult.Success -> {
+                        handleLoadSuccess(result.value)
+                    }
+
                     is TuripResult.Failure -> {
                         Napier.e("아티클 상세 조회 실패: $articleId", result.cause)
                         handleLoadFailure(result)
@@ -69,16 +76,26 @@ class ArticleDetailViewModel(
     private fun handleLoadFailure(failure: TuripResult.Failure) {
         val errorUiState: ErrorUiState =
             when (failure.errorType.toUiError()) {
-                UiError.Global.Network -> ErrorUiState.Network
-                UiError.Global.Server -> ErrorUiState.Server
+                UiError.Global.Network -> {
+                    ErrorUiState.Network
+                }
+
+                UiError.Global.Server -> {
+                    ErrorUiState.Server
+                }
+
                 UiError.Global.TokenExpired -> {
                     navigateToLogin()
                     return
                 }
 
-                UiError.Feature.NotFound -> ErrorUiState.NotFound
+                UiError.Feature.NotFound -> {
+                    ErrorUiState.NotFound
+                }
 
-                else -> ErrorUiState.Unexpected
+                else -> {
+                    ErrorUiState.Unexpected
+                }
             }
 
         updateState {
