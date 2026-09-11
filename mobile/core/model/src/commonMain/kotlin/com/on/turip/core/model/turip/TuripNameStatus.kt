@@ -10,8 +10,8 @@ enum class TuripNameStatus {
     ;
 
     companion object {
+        const val MAX_LENGTH = 20
         private const val MIN_LENGTH = 1
-        private const val MAX_LENGTH = 20
         private const val DEFAULT_NAME = "기본 튜립"
 
         fun of(

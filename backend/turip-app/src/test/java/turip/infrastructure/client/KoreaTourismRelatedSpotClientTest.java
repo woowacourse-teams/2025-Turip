@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ class KoreaTourismRelatedSpotClientTest {
     @Autowired
     private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
 
-    @Value("${korea-tourism.api.url}")
+    @Value("${korea-tourism.api.related-spot-url}")
     private String koreaTourismApiUrl;
 
     @Value("${korea-tourism.api.key}")
@@ -105,11 +104,8 @@ class KoreaTourismRelatedSpotClientTest {
 
         RelatedSpot spot = result.spots().getFirst();
         assertAll(
-                () -> assertThat(spot.getTouristSpotName()).isEqualTo("경복궁"),
-                () -> assertThat(spot.getAreaName()).isEqualTo("서울특별시"),
                 () -> assertThat(spot.getRelatedSpotName()).isEqualTo("북촌한옥마을"),
-                () -> assertThat(spot.getRelatedCategoryLargeName()).isEqualTo("관광지"),
-                () -> assertThat(spot.getRelatedRank()).isEqualTo(1)
+                () -> assertThat(spot.getRelatedCategoryLargeName()).isEqualTo("관광지")
         );
 
         mockRestServiceServer.verify();

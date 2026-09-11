@@ -88,6 +88,7 @@ public enum ErrorTag {
     ARTICLE_IMAGE_INVALID_TYPE("이미지 파일만 업로드할 수 있습니다. (jpg, jpeg, png, webp, gif만 허용)"),
     ARTICLE_IMAGE_TOO_LARGE("이미지 파일의 최대 크기(10MB)를 초과했습니다."),
     ARTICLE_ORDER_INVALID("요청한 아티클 순서 정보가 현재 목록과 일치하지 않습니다."),
+    NOT_ADMIN_ACCOUNT("작업 대상이 관리자 계정이 아닙니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),

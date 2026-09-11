@@ -23,6 +23,10 @@ spring:
   jackson:
     time-zone: Asia/Seoul
 
+turip:
+  article:
+    default-thumbnail-url: ${ARTICLE_DEFAULT_THUMBNAIL_URL}
+
 region:
   category:
     domestic:
@@ -63,7 +67,11 @@ youtube:
 korea-tourism:
   api:
     key: ${KOREA_TOURISM_API_KEY}
-    url: https://apis.data.go.kr/B551011/TarRlteTarService1/areaBasedList1
+    image-url: https://apis.data.go.kr/B551011/PhokoAwrdService/phokoAwrdList
+    related-spot-url: https://apis.data.go.kr/B551011/TarRlteTarService1/areaBasedList1
+  visitor-api:
+    metco-url: https://apis.data.go.kr/B551011/DataLabService/metcoRegnVisitrDDList
+    locgo-url: https://apis.data.go.kr/B551011/DataLabService/locgoRegnVisitrDDList
 
 apple:
   client-id: ${APPLE_CLIENT_ID}

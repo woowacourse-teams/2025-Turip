@@ -3,6 +3,7 @@ package com.on.turip.feature.search.impl.regionresult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -40,7 +41,12 @@ fun RegionResultScreen(
         viewModel.initRegionCategoryName(regionCategoryName)
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+    ) {
         Surface(
             color = TuripTheme.colors.white,
             modifier = Modifier.statusBarsPadding(),

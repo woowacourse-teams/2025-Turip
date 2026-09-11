@@ -2,6 +2,7 @@ package com.on.turip.feature.trip.impl.mapper
 
 import com.on.turip.core.model.trip.ContentPlace
 import com.on.turip.core.model.trip.TripDuration
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.feature.trip.impl.model.PlaceModel
 import com.on.turip.feature.trip.impl.model.TripDurationModel
 
@@ -11,6 +12,7 @@ fun ContentPlace.toUiModel(): PlaceModel =
         name = place.name,
         category = place.category.joinToString(),
         mapLink = place.url,
+        appleMap = AppleMap(place.name, place.latitude, place.longitude),
         timeLine = timeLine,
         isTuripPlace = isTuripPlace,
     )

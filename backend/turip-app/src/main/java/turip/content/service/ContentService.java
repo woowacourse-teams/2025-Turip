@@ -3,9 +3,10 @@ package turip.content.service;
 import static turip.region.domain.DomesticRegionCategory.OTHER_DOMESTIC;
 import static turip.region.domain.OverseasRegionCategory.OTHER_OVERSEAS;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
+import turip.common.util.DateRangeCalculator;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentDetailResponse;
 import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
@@ -35,9 +37,6 @@ import turip.region.domain.OverseasRegionCategory;
 @Service
 @RequiredArgsConstructor
 public class ContentService {
-
-    private static final int DAYS_UNTIL_SUNDAY = 6;
-    private static final int ONE_WEEK = 1;
 
     private final ContentRepository contentRepository;
     private final ContentPlaceService contentPlaceService;
@@ -82,22 +81,21 @@ public class ContentService {
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Account account,
                                                                                    int topContentSize) {
-        List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
-        LocalDate startDate = lastWeekPeriod.getFirst();
-        LocalDate endDate = lastWeekPeriod.getLast();
+        DateRangeCalculator.DateRange lastWeek = DateRangeCalculator.lastWeekRange();
+        LocalDate startDate = lastWeek.startDate();
+        LocalDate endDate = lastWeek.endDate();
 
-        List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
+        List<Long> popularContentIds = favoriteContentRepository.findPopularContentIdsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
 
-        if (popularContents.isEmpty()) {
+        if (popularContentIds.isEmpty()) {
             return WeeklyPopularFavoriteContentsResponse.from(new ArrayList<>());
         }
 
-        List<Long> contentIds = popularContents.stream()
-                .map(Content::getId)
-                .toList();
+        List<Content> popularContents = findContentsOrderedByPopularity(popularContentIds);
+
         Set<Long> favoritedContentIds = findFavoritedContentIds(account, popularContents);
-        Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
+        Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(popularContentIds);
 
         List<WeeklyPopularFavoriteContentResponse> weeklyPopularFavoriteContents = popularContents.stream()
                 .map(content -> {
@@ -143,42 +141,6 @@ public class ContentService {
         return contentRepository.countOverseasEtcContents(overseasCategoryNames);
     }
 
-    private Slice<Content> findContentSlicesByRegionCategory(
-            String regionCategory,
-            long lastId,
-            int size
-    ) {
-        Pageable pageable = PageRequest.of(0, size);
-        if (lastId == 0) {
-            lastId = Long.MAX_VALUE;
-        }
-
-        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
-            List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-            return contentRepository.findDomesticEtcContents(domesticCategoryNames, lastId, pageable);
-        }
-        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
-            List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-            return contentRepository.findOverseasEtcContents(overseasCategoryNames, lastId, pageable);
-        }
-        if (DomesticRegionCategory.containsName(regionCategory)) {
-            return contentRepository.findByCityName(regionCategory, lastId, pageable);
-        }
-        if (OverseasRegionCategory.containsName(regionCategory)) {
-            return contentRepository.findByCityCountryName(regionCategory, lastId, pageable);
-        }
-        throw new BadRequestException(ErrorTag.REGION_CATEGORY_INVALID);
-    }
-
-    private Set<Long> findFavoritedContentIds(Account account, List<Content> contents) {
-        List<Long> contentIds = contents.stream()
-                .map(Content::getId)
-                .toList();
-        return favoriteContentRepository.findByAccountIdAndContentIdIn(account.getId(), contentIds).stream()
-                .map(favorite -> favorite.getContent().getId())
-                .collect(Collectors.toSet());
-    }
-
     private ContentDetailsWithLoadableResponse convertToContentsDetailWithLoadableResponse(Account account,
                                                                                            Slice<Content> contentSlice) {
         List<Content> contents = contentSlice.getContent();
@@ -208,10 +170,50 @@ public class ContentService {
         return ContentDetailsWithLoadableResponse.of(contentDetails, loadable);
     }
 
-    private List<LocalDate> getLastWeekPeriod() {
-        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
-        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
-        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
-        return new ArrayList<>(List.of(lastWeekMonday, lastWeekSunday));
+    private Set<Long> findFavoritedContentIds(Account account, List<Content> contents) {
+        List<Long> contentIds = contents.stream()
+                .map(Content::getId)
+                .toList();
+        return favoriteContentRepository.findByAccountIdAndContentIdIn(account.getId(), contentIds).stream()
+                .map(favorite -> favorite.getContent().getId())
+                .collect(Collectors.toSet());
+    }
+
+    private Slice<Content> findContentSlicesByRegionCategory(
+            String regionCategory,
+            long lastId,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(0, size);
+        if (lastId == 0) {
+            lastId = Long.MAX_VALUE;
+        }
+
+        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
+            List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+            return contentRepository.findDomesticEtcContents(domesticCategoryNames, lastId, pageable);
+        }
+        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
+            List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+            return contentRepository.findOverseasEtcContents(overseasCategoryNames, lastId, pageable);
+        }
+        if (DomesticRegionCategory.containsName(regionCategory)) {
+            return contentRepository.findByCityName(regionCategory, lastId, pageable);
+        }
+        if (OverseasRegionCategory.containsName(regionCategory)) {
+            return contentRepository.findByCityCountryName(regionCategory, lastId, pageable);
+        }
+        throw new BadRequestException(ErrorTag.REGION_CATEGORY_INVALID);
+    }
+
+    private List<Content> findContentsOrderedByPopularity(List<Long> popularContentIds) {
+        Map<Long, Integer> orderById = new HashMap<>();
+        for (int i = 0; i < popularContentIds.size(); i++) {
+            orderById.put(popularContentIds.get(i), i);
+        }
+        // findAllByIdIn은 IN 절 순서를 보장하지 않으므로 찜 많은 순으로 다시 정렬한다
+        return contentRepository.findAllByIdIn(popularContentIds).stream()
+                .sorted(Comparator.comparing(content -> orderById.get(content.getId())))
+                .toList();
     }
 }
