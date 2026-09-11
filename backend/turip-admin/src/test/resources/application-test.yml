@@ -50,10 +50,6 @@ korea-tourism:
 apple:
   client-id: com.teamturip.test
 
-turip:
-  article:
-    default-thumbnail-url: https://test.example.com/article-default-thumbnail.jpg
-
 # CSV Import 설정
 csv:
   import:
