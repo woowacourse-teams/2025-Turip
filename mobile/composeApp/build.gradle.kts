@@ -22,6 +22,7 @@ kotlin {
             implementation(project(":feature:splash:impl"))
             implementation(project(":feature:login:impl"))
             implementation(project(":feature:invitation:impl"))
+            implementation(project(":feature:article:impl"))
             implementation(project(":feature:home:impl"))
             implementation(project(":feature:bookmark:impl"))
             implementation(project(":feature:mypage:impl"))
@@ -122,6 +123,14 @@ android {
                 keyAlias = androidKeystoreProperties.getProperty("debug_key_alias")
                 keyPassword = androidKeystoreProperties.getProperty("debug_key_password")
             }
+            androidKeystoreProperties.getProperty("release_store_file")?.let { releaseStoreFile ->
+                create("release") {
+                    storeFile = file(releaseStoreFile)
+                    storePassword = androidKeystoreProperties.getProperty("release_store_password")
+                    keyAlias = androidKeystoreProperties.getProperty("release_key_alias")
+                    keyPassword = androidKeystoreProperties.getProperty("release_key_password")
+                }
+            }
         }
     }
 
@@ -144,6 +153,7 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.findByName("release")
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name",

@@ -7,6 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":feature:home:api"))
             implementation(project(":feature:popularregion:api"))
+            implementation(project(":feature:article:api"))
             implementation(project(":feature:randomtravel:api"))
             implementation(project(":feature:search:api"))
             implementation(project(":feature:trip:api"))

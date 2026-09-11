@@ -5,6 +5,11 @@
 xcuserdata
 !src/**/build/
 local.properties
+# signing
+key/
+*.keystore
+*.jks
+keystore.properties
 google-services.json
 GoogleService-Info.plist
 iosApp/iosApp/GoogleService-Info.plist
@@ -28,3 +33,4 @@ codereview.md
 bug.md
 slot_flow.md
 turip-slot-flow (1).html
+HANDOFF.md

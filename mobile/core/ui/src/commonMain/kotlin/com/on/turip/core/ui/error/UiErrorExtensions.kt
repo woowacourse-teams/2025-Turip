@@ -1,6 +1,7 @@
 package com.on.turip.core.ui.error
 
 import com.on.turip.core.model.result.ErrorType
+import com.on.turip.core.model.result.ErrorType.Article
 import com.on.turip.core.model.result.ErrorType.Auth
 import com.on.turip.core.model.result.ErrorType.Content
 import com.on.turip.core.model.result.ErrorType.Creator
@@ -14,6 +15,7 @@ fun ErrorType.toUiError(): UiError =
 
         Auth.Forbidden -> UiError.Feature.PermissionDenied
 
+        Article.NotFound,
         Creator.NotFound,
         Content.NotFound,
         Place.NotFound,

@@ -1,6 +1,7 @@
 package com.on.turip.core.network.di
 
 import com.on.turip.core.data.datasource.AccountRemoteDataSource
+import com.on.turip.core.data.datasource.ArticleRemoteDataSource
 import com.on.turip.core.data.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.core.data.datasource.AuthRemoteDataSource
 import com.on.turip.core.data.datasource.BookmarkRemoteDataSource
@@ -12,6 +13,7 @@ import com.on.turip.core.data.datasource.RegionRemoteDataSource
 import com.on.turip.core.data.datasource.TuripRemoteDataSource
 import com.on.turip.core.data.datasource.TuripSseStreamDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultAccountRemoteDataSource
+import com.on.turip.core.network.datasourceimpl.DefaultArticleRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultAuthRefreshRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultAuthRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultBookmarkRemoteDataSource
@@ -40,6 +42,7 @@ fun datasourceModule(baseUrl: String) = module {
     single<AuthRefreshRemoteDataSource> {
         DefaultAuthRefreshRemoteDataSource(authService = get(named(NO_AUTH_AUTH_SERVICE)))
     }
+    single<ArticleRemoteDataSource> { DefaultArticleRemoteDataSource(articleService = get()) }
     single<BookmarkRemoteDataSource> { DefaultBookmarkRemoteDataSource(bookmarkService = get()) }
     single<ContentRemoteDataSource> { DefaultContentRemoteDataSource(contentService = get()) }
     single<GuestRemoteDataSource> { DefaultGuestRemoteDataSource(guestService = get()) }

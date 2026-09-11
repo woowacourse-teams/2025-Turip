@@ -40,6 +40,7 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.feature.home.impl.component.HomeAppBar
+import com.on.turip.feature.home.impl.component.MagazineSection
 import com.on.turip.feature.home.impl.component.PopularRegionCtaButton
 import com.on.turip.feature.home.impl.component.RandomTravelCtaButton
 import com.on.turip.feature.home.impl.component.RegionList
@@ -60,6 +61,8 @@ fun HomeScreen(
     onContentClick: (contentId: Long) -> Unit,
     onRandomTravelClick: () -> Unit,
     onPopularRegionClick: () -> Unit,
+    onArticleClick: (articleId: Long) -> Unit,
+    onMagazineMoreClick: () -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
@@ -109,6 +112,8 @@ fun HomeScreen(
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
             onRandomTravelClick = viewModel::clickRandomTravel,
             onPopularRegionClick = onPopularRegionClick,
+            onArticleClick = onArticleClick,
+            onMagazineMoreClick = onMagazineMoreClick,
         )
     }
 }
@@ -123,6 +128,8 @@ private fun HomeScreenContent(
     onDomesticClick: (isDomestic: Boolean) -> Unit,
     onRandomTravelClick: () -> Unit,
     onPopularRegionClick: () -> Unit,
+    onArticleClick: (articleId: Long) -> Unit,
+    onMagazineMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -211,6 +218,13 @@ private fun HomeScreenContent(
                 RegionList(
                     regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
+                )
+
+                MagazineSection(
+                    articles = uiState.articles,
+                    isLoading = uiState.isArticlesLoading,
+                    onArticleClick = onArticleClick,
+                    onMoreClick = onMagazineMoreClick,
                     modifier = Modifier.padding(bottom = TuripTheme.spacing.large),
                 )
             }
@@ -233,6 +247,8 @@ private fun HomeLoadingPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -266,6 +282,8 @@ private fun HomeSuccessPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -287,6 +305,8 @@ private fun HomeServerErrorPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -308,6 +328,8 @@ private fun HomeNetworkErrorPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }

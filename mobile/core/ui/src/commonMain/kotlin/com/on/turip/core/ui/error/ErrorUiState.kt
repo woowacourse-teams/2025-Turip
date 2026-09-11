@@ -2,6 +2,8 @@ package com.on.turip.core.ui.error
 
 import androidx.compose.runtime.Immutable
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.article_detail_not_found
+import com.on.turip.core.designsystem.generated.resources.article_detail_not_found_description
 import com.on.turip.core.designsystem.generated.resources.cannot_connect_network
 import com.on.turip.core.designsystem.generated.resources.check_connection_status
 import com.on.turip.core.designsystem.generated.resources.ic_network_error
@@ -24,6 +26,11 @@ sealed interface ErrorUiState {
     data object Server : ErrorUiState
 
     data object Network : ErrorUiState
+
+    /**
+     * 요청한 리소스가 서버에 없거나 비공개인 경우. 재시도해도 결과가 바뀌지 않는다.
+     */
+    data object NotFound : ErrorUiState
 }
 
 fun ErrorUiState.toUiModel(): ErrorUiModel? =
@@ -42,6 +49,15 @@ fun ErrorUiState.toUiModel(): ErrorUiModel? =
                 imageRes = Res.drawable.ic_network_error,
                 titleRes = Res.string.cannot_connect_network,
                 descriptionRes = Res.string.check_connection_status,
+                retryTextRes = Res.string.retry,
+            )
+        }
+
+        ErrorUiState.NotFound -> {
+            ErrorUiModel(
+                imageRes = Res.drawable.mascot,
+                titleRes = Res.string.article_detail_not_found,
+                descriptionRes = Res.string.article_detail_not_found_description,
                 retryTextRes = Res.string.retry,
             )
         }
