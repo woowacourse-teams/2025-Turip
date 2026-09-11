@@ -1,8 +1,11 @@
 package turip.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,6 +26,7 @@ import turip.controller.dto.response.AdminArticlesResponse;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminArticleService;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/admin/articles")
 @RequiredArgsConstructor
@@ -39,7 +43,10 @@ public class AdminArticleController {
     @GetMapping
     public ResponseEntity<AdminArticlesResponse> findArticles(
             @AuthAdmin TuripMember admin,
-            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "10")
+            @Min(value = 1, message = "size는 1 이상이어야 합니다.")
+            @Max(value = 10, message = "size는 10 이하여야 합니다.")
+            Integer size,
             @RequestParam(required = false) Long lastId
     ) {
         return ResponseEntity.ok(adminArticleService.findArticles(size, lastId));
