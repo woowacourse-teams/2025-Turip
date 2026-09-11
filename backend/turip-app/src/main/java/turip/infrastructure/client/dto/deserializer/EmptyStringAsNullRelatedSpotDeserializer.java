@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.Items;
 
-public class EmptyStringAsNullDeserializer extends JsonDeserializer<Items> {
+public class EmptyStringAsNullRelatedSpotDeserializer extends JsonDeserializer<Items> {
 
     @Override
     public Items deserialize(JsonParser parser, DeserializationContext context) throws IOException {

@@ -29,7 +29,7 @@ fun TuripAddBottomSheet(
     turipNameStatus: TuripNameStatusModel,
     isConfirmEnabled: Boolean,
     onNameChanged: (name: String) -> Unit,
-    onConfirmClick: () -> Unit,
+    onConfirmClick: (name: String) -> Unit,
     onDismiss: () -> Unit,
     snackbarHostState: SnackbarHostState? = null,
 ) {

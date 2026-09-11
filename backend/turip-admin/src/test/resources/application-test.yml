@@ -41,7 +41,11 @@ youtube:
 korea-tourism:
   api:
     key: test-korea-tourism-api-key
-    url: https://test.apis.data.go.kr
+    image-url: https://test.apis.data.go.kr
+    related-spot-url: https://test.apis.data.go.kr
+  visitor-api:
+    metco-url: https://test.apis.data.go.kr/metco
+    locgo-url: https://test.apis.data.go.kr/locgo
 
 apple:
   client-id: com.teamturip.test
@@ -50,6 +54,13 @@ apple:
 csv:
   import:
     password: test_password_123
+
+turip:
+  article:
+    default-thumbnail-url: https://test.example.com/article-default-thumbnail.jpg
+    s3:
+      bucket: test-bucket
+      region: ap-northeast-2
 
 # Region Category 기타 이미지 설정 (테스트용 더미 값)
 region:

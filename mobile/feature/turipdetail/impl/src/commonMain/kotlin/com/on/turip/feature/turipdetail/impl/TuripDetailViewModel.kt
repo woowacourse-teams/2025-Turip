@@ -494,16 +494,20 @@ class TuripDetailViewModel(
         }
     }
 
-    fun updateTuripName() {
+    fun updateTuripName(name: String = uiState.value.inputTuripName) {
+        val status: TuripNameStatusModel = TuripNameStatusModel.of(name, uiState.value.editModels)
+        if (!status.isConfirmEnabled) return
+        _uiState.update { it.copy(inputTuripName = name, turipNameStatus = status) }
+
         viewModelScope.launch {
             turipRepository
-                .updateTurip(uiState.value.selectedTurip.id, uiState.value.inputTuripName)
+                .updateTurip(uiState.value.selectedTurip.id, name)
                 .onSuccess {
                     _uiState.update { state: TuripDetailUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            selectedTurip = uiState.value.selectedTurip.copy(name = uiState.value.inputTuripName),
+                            selectedTurip = uiState.value.selectedTurip.copy(name = name),
                             inputTuripName = "",
                         )
                     }
