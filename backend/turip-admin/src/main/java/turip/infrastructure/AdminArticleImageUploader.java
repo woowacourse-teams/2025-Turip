@@ -3,6 +3,7 @@ package turip.infrastructure;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,11 @@ import turip.common.exception.custom.InternalServerException;
 @Component
 public class AdminArticleImageUploader {
 
-    private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
-            "image/jpeg", "image/png", "image/webp", "image/gif"
+    private static final Map<String, String> CONTENT_TYPE_TO_EXTENSION = Map.of(
+            "image/jpeg", ".jpg",
+            "image/png", ".png",
+            "image/webp", ".webp",
+            "image/gif", ".gif"
     );
     private static final long MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -39,7 +43,7 @@ public class AdminArticleImageUploader {
         validateContentType(file);
         validateSize(file);
 
-        String key = "article/" + UUID.randomUUID() + extractExtension(file);
+        String key = "article/" + UUID.randomUUID() + extensionFor(file.getContentType());
         putObject(file, key);
 
         return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
@@ -47,7 +51,7 @@ public class AdminArticleImageUploader {
 
     private void validateContentType(MultipartFile file) {
         String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+        if (contentType == null || !CONTENT_TYPE_TO_EXTENSION.containsKey(contentType)) {
             throw new BadRequestException(ErrorTag.ARTICLE_IMAGE_INVALID_TYPE);
         }
     }
@@ -58,12 +62,8 @@ public class AdminArticleImageUploader {
         }
     }
 
-    private String extractExtension(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null || !originalFilename.contains(".")) {
-            return "";
-        }
-        return originalFilename.substring(originalFilename.lastIndexOf("."));
+    private String extensionFor(String contentType) {
+        return CONTENT_TYPE_TO_EXTENSION.get(contentType);
     }
 
     private void putObject(MultipartFile file, String key) {
