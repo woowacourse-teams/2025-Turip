@@ -54,9 +54,9 @@ class ArticleServiceTest {
             String defaultThumbnailUrl = "https://turip.com/static/default-thumbnail.png";
             ReflectionTestUtils.setField(articleService, "defaultThumbnailUrl", defaultThumbnailUrl);
 
-            Article article = new Article("제목", "부제목", "본문", null, null, 1);
+            Article article = new Article("제목", "부제목", "본문", null, null, 1, false);
             ReflectionTestUtils.setField(article, "id", 1L);
-            given(articleRepository.findFirstPageByIsPublishedTrue(PageRequest.of(0, size)))
+            given(articleRepository.findFirstPage(true, PageRequest.of(0, size)))
                     .willReturn(new SliceImpl<>(List.of(article)));
             given(articleTagRepository.findAllByArticleIdIn(List.of(1L)))
                     .willReturn(List.of());
@@ -75,7 +75,7 @@ class ArticleServiceTest {
             // given
             int size = 10;
             Article article = ArticleFixture.createWithId(1L, null);
-            given(articleRepository.findFirstPageByIsPublishedTrue(PageRequest.of(0, size)))
+            given(articleRepository.findFirstPage(true, PageRequest.of(0, size)))
                     .willReturn(new SliceImpl<>(List.of(article)));
             given(articleTagRepository.findAllByArticleIdIn(List.of(1L)))
                     .willReturn(List.of());
@@ -99,7 +99,7 @@ class ArticleServiceTest {
 
             given(articleRepository.findByIdAndIsPublishedTrue(lastId))
                     .willReturn(Optional.of(cursorArticle));
-            given(articleRepository.findNextPageByIsPublishedTrue(cursorArticle.getDisplayOrder(),
+            given(articleRepository.findNextPage(true, cursorArticle.getDisplayOrder(),
                     PageRequest.of(0, size)))
                     .willReturn(new SliceImpl<>(List.of(nextArticle)));
             given(articleTagRepository.findAllByArticleIdIn(List.of(2L)))
@@ -136,7 +136,7 @@ class ArticleServiceTest {
             Tag tag = new Tag("드라이브");
             ArticleTag articleTag = new ArticleTag(article, tag);
 
-            given(articleRepository.findFirstPageByIsPublishedTrue(PageRequest.of(0, size)))
+            given(articleRepository.findFirstPage(true, PageRequest.of(0, size)))
                     .willReturn(new SliceImpl<>(List.of(article)));
             given(articleTagRepository.findAllByArticleIdIn(List.of(1L)))
                     .willReturn(List.of(articleTag));

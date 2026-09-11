@@ -79,6 +79,11 @@
             </a>
         </li>
         <li>
+            <a class="sidebar-link" th:classappend="${activeMenu == 'articles'} ? 'active'" href="/admin/articles">
+                <i class="fa-solid fa-newspaper"></i> 아티클 관리
+            </a>
+        </li>
+        <li>
             <a class="sidebar-link" th:classappend="${activeMenu == 'popular'} ? 'active'"
                href="/admin/contents/popular">
                 <i class="fa-solid fa-fire"></i> 인기 콘텐츠 관리

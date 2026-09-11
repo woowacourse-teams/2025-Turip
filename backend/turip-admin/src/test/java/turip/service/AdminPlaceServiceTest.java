@@ -13,28 +13,36 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
 import turip.common.exception.custom.BadRequestException;
 import turip.infrastructure.client.PlaceSearchClient;
+import turip.place.controller.dto.response.PlaceResponse;
 import turip.place.controller.dto.response.PlaceSearchResponse;
+import turip.place.domain.Place;
 import turip.place.domain.PlaceSearchProvider;
 import turip.place.domain.PlaceSearchType;
+import turip.place.repository.PlaceRepository;
+import turip.util.fixture.PlaceFixture;
 
 class AdminPlaceServiceTest {
 
     private AdminPlaceService adminPlaceService;
     private PlaceSearchClient kakaoClient;
     private PlaceSearchClient googleClient;
+    private PlaceRepository placeRepository;
 
     @BeforeEach
     void setUp() {
         kakaoClient = mock(PlaceSearchClient.class);
         googleClient = mock(PlaceSearchClient.class);
+        placeRepository = mock(PlaceRepository.class);
 
         when(kakaoClient.supports(PlaceSearchType.DOMESTIC)).thenReturn(true);
         when(googleClient.supports(PlaceSearchType.OVERSEAS)).thenReturn(true);
 
-        adminPlaceService = new AdminPlaceService(List.of(kakaoClient, googleClient));
+        adminPlaceService = new AdminPlaceService(List.of(kakaoClient, googleClient), placeRepository);
     }
 
     @Test
@@ -76,10 +84,49 @@ class AdminPlaceServiceTest {
     void searchPlaces_withUnsupportedType_throwsException() {
         // given
         String query = "test";
-        AdminPlaceService serviceWithNoSupportingClients = new AdminPlaceService(Collections.emptyList());
+        AdminPlaceService serviceWithNoSupportingClients =
+                new AdminPlaceService(Collections.emptyList(), placeRepository);
 
         // when & then
         assertThatThrownBy(() -> serviceWithNoSupportingClients.searchPlaces(query, PlaceSearchType.DOMESTIC))
                 .isInstanceOf(BadRequestException.class);
+    }
+
+    @DisplayName("장소 조회 기능 테스트")
+    @Nested
+    class FindPlaces {
+
+        @DisplayName("query가 없으면 전체 장소를 id 내림차순으로 조회한다")
+        @Test
+        void findPlaces_withoutQuery_returnsAllOrderedByIdDesc() {
+            // given
+            Place place = PlaceFixture.createWithId(1L);
+            when(placeRepository.findAllByOrderByIdDesc(PageRequest.of(0, 20)))
+                    .thenReturn(List.of(place));
+
+            // when
+            List<PlaceResponse> responses = adminPlaceService.findPlaces(null, 20);
+
+            // then
+            assertThat(responses).hasSize(1);
+            assertThat(responses.get(0).id()).isEqualTo(1L);
+        }
+
+        @DisplayName("query가 있으면 fulltext 검색으로 조회한다")
+        @Test
+        void findPlaces_withQuery_returnsSearchResult() {
+            // given
+            Place place = PlaceFixture.createWithId(1L);
+            when(placeRepository.createBooleanModeKeyword("서울")).thenReturn("+서울");
+            when(placeRepository.findByNameContaining("+서울", PageRequest.of(0, 20)))
+                    .thenReturn(List.of(place));
+
+            // when
+            List<PlaceResponse> responses = adminPlaceService.findPlaces("서울", 20);
+
+            // then
+            assertThat(responses).hasSize(1);
+            assertThat(responses.get(0).id()).isEqualTo(1L);
+        }
     }
 }

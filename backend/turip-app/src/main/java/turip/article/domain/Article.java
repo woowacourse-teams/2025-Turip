@@ -63,7 +63,8 @@ public class Article extends BaseTimeEntity {
             String content,
             String thumbnailUrl,
             Account author,
-            int displayOrder
+            int displayOrder,
+            boolean isPublished
     ) {
         validateTitle(title);
         validateSubtitle(subtitle);
@@ -75,11 +76,7 @@ public class Article extends BaseTimeEntity {
         this.thumbnailUrl = thumbnailUrl;
         this.author = author;
         this.displayOrder = displayOrder;
-        this.isPublished = false;
-    }
-
-    public void publish() {
-        this.isPublished = true;
+        this.isPublished = isPublished;
     }
 
     private void validateTitle(String title) {
@@ -107,5 +104,21 @@ public class Article extends BaseTimeEntity {
         if (content.getBytes(StandardCharsets.UTF_8).length > 65535) {
             throw new IllegalArgumentException(ErrorTag.ARTICLE_CONTENT_TOO_LONG);
         }
+    }
+
+    public void update(String title, String subtitle, String content, String thumbnailUrl, boolean isPublished) {
+        validateTitle(title);
+        validateSubtitle(subtitle);
+        validateContent(content);
+
+        this.title = title;
+        this.subtitle = subtitle;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+        this.isPublished = isPublished;
+    }
+
+    public void reorder(int displayOrder) {
+        this.displayOrder = displayOrder;
     }
 }

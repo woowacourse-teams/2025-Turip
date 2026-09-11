@@ -26,7 +26,8 @@ public class ArticleFixture {
                 "본문" + uniqueId,
                 "https://turip.com/static/thumbnail-" + uniqueId,
                 author,
-                1
+                1,
+                false
         );
         ReflectionTestUtils.setField(article, "id", id);
         return article;

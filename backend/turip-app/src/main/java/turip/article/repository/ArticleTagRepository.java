@@ -12,4 +12,6 @@ public interface ArticleTagRepository extends JpaRepository<ArticleTag, Long> {
 
     @EntityGraph(attributePaths = {"tag"}, type = EntityGraph.EntityGraphType.FETCH)
     List<ArticleTag> findAllByArticleId(Long articleId);
+
+    void deleteAllByArticleId(Long articleId);
 }

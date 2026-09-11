@@ -76,4 +76,24 @@ public class AdminViewController {
         model.addAttribute("activeMenu", "my");
         return "admin/my";
     }
+
+    @GetMapping("/articles")
+    public String articleListPage(@AuthAdmin TuripMember admin, Model model) {
+        model.addAttribute("activeMenu", "articles");
+        return "admin/article-list";
+    }
+
+    @GetMapping("/articles/new")
+    public String articleCreatePage(@AuthAdmin TuripMember admin, Model model) {
+        model.addAttribute("activeMenu", "articles");
+        model.addAttribute("articleId", (Long) null);
+        return "admin/article-form";
+    }
+
+    @GetMapping("/articles/{id}/edit")
+    public String articleEditPage(@AuthAdmin TuripMember admin, @PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "articles");
+        model.addAttribute("articleId", id);
+        return "admin/article-form";
+    }
 }

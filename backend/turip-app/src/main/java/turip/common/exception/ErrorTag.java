@@ -85,6 +85,9 @@ public enum ErrorTag {
     CONTENT_PENDING_NOT_FOUND("펜딩 콘텐츠를 찾을 수 없습니다."),
     REJECT_REASON_REQUIRED("거절 사유를 입력해주세요."),
     VALIDATOR_NOT_VALID("해당 콘텐츠를 검증할 권한이 없습니다."),
+    ARTICLE_IMAGE_INVALID_TYPE("이미지 파일만 업로드할 수 있습니다. (jpg, jpeg, png, webp, gif만 허용)"),
+    ARTICLE_IMAGE_TOO_LARGE("이미지 파일의 최대 크기(10MB)를 초과했습니다."),
+    ARTICLE_ORDER_INVALID("요청한 아티클 순서 정보가 현재 목록과 일치하지 않습니다."),
     NOT_ADMIN_ACCOUNT("작업 대상이 관리자 계정이 아닙니다."),
 
     // 404 Not Found
@@ -97,7 +100,8 @@ public enum ErrorTag {
     DUPLICATE_PENDING_CONTENT("이미 검수 대기 중인 콘텐츠입니다."),
 
     // 500 Internal Server Error
-    YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");
+    YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다."),
+    ARTICLE_IMAGE_UPLOAD_FAILED("이미지 업로드에 실패했습니다.");
 
     private final String message;
 

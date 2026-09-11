@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Turip Admin - 아티클 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        body {
+            background: linear-gradient(135deg, #becdfd, #ffffff);
+            min-height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            height: 64px;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 35px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 30px;
+            border-left: 6px solid #6e8efb;
+            padding-left: 20px;
+            letter-spacing: -1px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table {
+            --bs-table-hover-bg: #f8faff;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #f0f0f0;
+            color: #444;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 15px 10px;
+        }
+
+        .table tbody td {
+            padding: 16px 10px;
+            border-bottom: 1px solid #f1f1f1;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .article-thumbnail {
+            width: 90px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f1f1f1;
+            flex-shrink: 0;
+        }
+
+        .article-info-row {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .article-title {
+            font-weight: 700;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .article-subtitle {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .tag-chip {
+            display: inline-block;
+            padding: 3px 10px;
+            margin: 2px 4px 2px 0;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #eef1ff;
+            color: #6e8efb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-badge.published {
+            background: #eafaf0;
+            color: #2fa360;
+        }
+
+        .status-badge.unpublished {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .load-more-wrapper {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-load-more {
+            border: 1px solid #ddd;
+            background: white;
+            color: #555;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn-load-more:hover {
+            background: #f8faff;
+            border-color: #6e8efb;
+            color: #6e8efb;
+        }
+    </style>
+    <th:block th:replace="~{admin/fragments/sidebar :: sidebar-style}"></th:block>
+</head>
+<body>
+
+<div aria-atomic="true" aria-live="polite" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div class="toast align-items-center border-0" id="errorToast" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold" id="toastMessage"></div>
+            <button aria-label="Close" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    type="button"></button>
+        </div>
+    </div>
+</div>
+
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
+</div>
+
+<div class="layout">
+    <div class="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="main-content">
+        <div class="admin-card">
+            <div class="section-header">
+                <h3 class="section-title" style="margin-bottom: 0;">아티클 관리</h3>
+                <a class="btn btn-primary" href="/admin/articles/new">+ 새 아티클</a>
+            </div>
+
+            <div class="table-responsive" style="margin-top: 25px;">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>아티클 정보</th>
+                        <th style="width: 25%;">태그</th>
+                        <th style="width: 10%; text-align: center;">공개 여부</th>
+                        <th style="width: 12%;">생성일</th>
+                        <th style="width: 15%; text-align: right;">관리</th>
+                    </tr>
+                    </thead>
+                    <tbody id="articleTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="load-more-wrapper">
+                <button class="btn-load-more d-none" id="loadMoreBtn" onclick="loadArticles(false)">더 보기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let lastArticleId = null;
+
+    async function authFetch(url, options = {}) {
+        const defaultOptions = {headers: {'Content-Type': 'application/json'}};
+        const mergedOptions = {...options, headers: {...defaultOptions.headers, ...options.headers}};
+        const response = await fetch(url, mergedOptions);
+        if (!response.ok) {
+            let errorMessage = `[에러 ${response.status}] 서버 응답 실패`;
+            try {
+                const errorBody = await response.json();
+                if (errorBody && errorBody.message) {
+                    errorMessage = errorBody.message;
+                }
+            } catch (jsonError) {
+                // response body was not JSON, use default message
+            }
+            throw new Error(errorMessage);
+        }
+        return response;
+    }
+
+    function showErrorToast(message) {
+        const toastEl = document.getElementById('errorToast');
+        document.getElementById('toastMessage').textContent = '⚠️ ' + message;
+        toastEl.classList.remove('text-bg-success');
+        toastEl.classList.add('text-bg-danger');
+        bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 5000}).show();
+    }
+
+    function formatDate(isoString) {
+        if (!isoString) return '';
+        return isoString.slice(0, 10);
+    }
+
+    async function loadArticles(isFirstPage) {
+        const tbody = document.getElementById('articleTableBody');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const params = new URLSearchParams({size: 10});
+        if (lastArticleId !== null) {
+            params.set('lastId', lastArticleId);
+        }
+
+        try {
+            const res = await authFetch(`/api/v1/admin/articles?${params.toString()}`);
+            const data = await res.json();
+
+            if (isFirstPage && data.articles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">등록된 아티클이 없습니다.</td></tr>';
+                loadMoreBtn.classList.add('d-none');
+                return;
+            }
+
+            data.articles.forEach(article => {
+                tbody.appendChild(createArticleRow(article));
+                lastArticleId = article.id;
+            });
+
+            loadMoreBtn.classList.toggle('d-none', !data.loadable);
+        } catch (e) {
+            showErrorToast('아티클 목록을 불러오지 못했습니다: ' + e.message);
+        }
+    }
+
+    function createArticleRow(article) {
+        const tr = document.createElement('tr');
+        tr.dataset.articleId = article.id;
+
+        const tdInfo = document.createElement('td');
+        const infoRow = document.createElement('div');
+        infoRow.className = 'article-info-row';
+
+        const thumbnail = document.createElement('img');
+        thumbnail.className = 'article-thumbnail';
+        thumbnail.alt = article.title;
+        thumbnail.src = article.thumbnailUrl;
+        infoRow.appendChild(thumbnail);
+
+        const textWrapper = document.createElement('div');
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'article-title';
+        titleSpan.textContent = article.title;
+        const subtitleSpan = document.createElement('span');
+        subtitleSpan.className = 'article-subtitle';
+        subtitleSpan.textContent = article.subtitle;
+        textWrapper.appendChild(titleSpan);
+        textWrapper.appendChild(subtitleSpan);
+        infoRow.appendChild(textWrapper);
+
+        tdInfo.appendChild(infoRow);
+        tr.appendChild(tdInfo);
+
+        const tdTags = document.createElement('td');
+        article.tags.forEach(tag => {
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            chip.textContent = tag;
+            tdTags.appendChild(chip);
+        });
+        tr.appendChild(tdTags);
+
+        const tdStatus = document.createElement('td');
+        tdStatus.className = 'text-center';
+        const statusBadge = document.createElement('span');
+        statusBadge.className = article.isPublished ? 'status-badge published' : 'status-badge unpublished';
+        statusBadge.textContent = article.isPublished ? '공개' : '비공개';
+        tdStatus.appendChild(statusBadge);
+        tr.appendChild(tdStatus);
+
+        const tdDate = document.createElement('td');
+        tdDate.textContent = formatDate(article.createdAt);
+        tr.appendChild(tdDate);
+
+        const tdAction = document.createElement('td');
+        tdAction.className = 'text-end';
+        const editLink = document.createElement('a');
+        editLink.className = 'btn btn-sm btn-outline-primary me-2';
+        editLink.href = `/admin/articles/${article.id}/edit`;
+        editLink.textContent = '수정';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-outline-danger';
+        deleteBtn.textContent = '삭제';
+        deleteBtn.onclick = () => deleteArticle(article.id, tr);
+        tdAction.appendChild(editLink);
+        tdAction.appendChild(deleteBtn);
+        tr.appendChild(tdAction);
+
+        return tr;
+    }
+
+    async function deleteArticle(articleId, rowEl) {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+
+        try {
+            await authFetch(`/api/v1/admin/articles/${articleId}`, {method: 'DELETE'});
+            rowEl.remove();
+        } catch (e) {
+            showErrorToast('아티클 삭제에 실패했습니다: ' + e.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => loadArticles(true));
+</script>
+</body>
+</html>

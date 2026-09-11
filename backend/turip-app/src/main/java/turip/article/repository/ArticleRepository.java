@@ -14,16 +14,22 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("""
             SELECT a FROM Article a
-            WHERE a.isPublished = true
+            LEFT JOIN FETCH a.author
+            WHERE (:onlyPublished = false OR a.isPublished = true)
             ORDER BY a.displayOrder ASC
             """)
-    Slice<Article> findFirstPageByIsPublishedTrue(Pageable pageable);
+    Slice<Article> findFirstPage(@Param("onlyPublished") boolean onlyPublished, Pageable pageable);
 
     @Query("""
             SELECT a FROM Article a
-            WHERE a.isPublished = true AND a.displayOrder > :cursorDisplayOrder
+            LEFT JOIN FETCH a.author
+            WHERE (:onlyPublished = false OR a.isPublished = true) AND a.displayOrder > :cursorDisplayOrder
             ORDER BY a.displayOrder ASC
             """)
-    Slice<Article> findNextPageByIsPublishedTrue(@Param("cursorDisplayOrder") int cursorDisplayOrder,
-                                                 Pageable pageable);
+    Slice<Article> findNextPage(@Param("onlyPublished") boolean onlyPublished,
+                                @Param("cursorDisplayOrder") int cursorDisplayOrder,
+                                Pageable pageable);
+
+    @Query("SELECT MIN(a.displayOrder) FROM Article a")
+    Optional<Integer> findMinDisplayOrder();
 }
