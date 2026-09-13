@@ -148,6 +148,8 @@ jobs:
           KOREA_TOURISM_API_KEY=${{ secrets.KOREA_TOURISM_API_KEY }}
           INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
           ARTICLE_DEFAULT_THUMBNAIL_URL=${{ secrets.ARTICLE_DEFAULT_THUMBNAIL_URL }}
+          ARTICLE_S3_BUCKET=${{ secrets.ARTICLE_S3_BUCKET }}
+          ARTICLE_S3_REGION=${{ secrets.ARTICLE_S3_REGION }}
           ADMIN_JAVA_XMS=${{ secrets.DEV_ADMIN_JAVA_XMS }}
           ADMIN_JAVA_XMX=${{ secrets.DEV_ADMIN_JAVA_XMX }}
           EOF
