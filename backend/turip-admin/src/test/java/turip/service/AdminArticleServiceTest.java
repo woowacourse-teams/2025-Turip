@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -117,7 +118,9 @@ class AdminArticleServiceTest {
             ReflectionTestUtils.setField(article, "id", 1L);
             return article;
         });
-        when(tagRepository.findAllByNameIn(List.of("여행", "행복"))).thenReturn(List.of(existingTag));
+        when(articleTagRepository.findAllByArticleId(1L)).thenReturn(List.of());
+        when(tagRepository.findAllByNameIn(argThat(names -> Set.copyOf(names).equals(Set.of("여행", "행복")))))
+                .thenReturn(List.of(existingTag));
         when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> {
             Tag tag = invocation.getArgument(0);
             ReflectionTestUtils.setField(tag, "id", 11L);
@@ -129,7 +132,7 @@ class AdminArticleServiceTest {
 
         // then
         verify(tagRepository, never()).findByName(any(String.class));
-        verify(tagRepository, times(1)).findAllByNameIn(List.of("여행", "행복"));
+        verify(tagRepository, times(1)).findAllByNameIn(any());
         verify(tagRepository, never()).save(existingTag);
         verify(tagRepository, times(1)).save(argThat(tag -> tag.getName().equals("행복")));
         verify(articleTagRepository, times(2)).save(any(ArticleTag.class));
@@ -151,7 +154,9 @@ class AdminArticleServiceTest {
             ReflectionTestUtils.setField(article, "id", 1L);
             return article;
         });
-        when(placeRepository.findAllById(List.of(1L, 999L))).thenReturn(List.of(existingPlace));
+        when(articlePlaceRepository.findAllByArticleId(1L)).thenReturn(List.of());
+        when(placeRepository.findAllById(argThat(ids -> Set.copyOf((List<Long>) ids).equals(Set.of(1L, 999L)))))
+                .thenReturn(List.of(existingPlace));
 
         // when
         adminArticleService.create(request, admin);
@@ -288,8 +293,8 @@ class AdminArticleServiceTest {
             assertThat(response.subtitle()).isEqualTo("새 부제목");
             assertThat(response.content()).isEqualTo("새 본문");
             assertThat(response.isPublished()).isTrue();
-            verify(articleTagRepository, times(1)).deleteAllByArticleId(articleId);
-            verify(articlePlaceRepository, times(1)).deleteAllByArticleId(articleId);
+            verify(articleTagRepository, times(1)).deleteAll(List.of());
+            verify(articlePlaceRepository, times(1)).deleteAll(List.of());
             verify(articleTagRepository, times(1)).save(any(ArticleTag.class));
             verify(articlePlaceRepository, times(1)).save(any(ArticlePlace.class));
         }
@@ -307,6 +312,71 @@ class AdminArticleServiceTest {
             // when & then
             assertThatThrownBy(() -> adminArticleService.update(articleId, request))
                     .isInstanceOf(NotFoundException.class);
+        }
+
+        @DisplayName("이전과 동일한 태그로 수정해도 재삽입하지 않고 그대로 유지한다")
+        @Test
+        void update3() {
+            // given
+            Long articleId = 1L;
+            Article article = ArticleFixture.createWithId(articleId, null);
+            AdminArticleUpdateRequest request = new AdminArticleUpdateRequest(
+                    "새 제목", "새 부제목", "새 본문", null, true, List.of("여행"), List.of()
+            );
+
+            Tag existingTag = new Tag("여행");
+            ReflectionTestUtils.setField(existingTag, "id", 10L);
+            ArticleTag existingArticleTag = new ArticleTag(article, existingTag);
+
+            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+            when(articleTagRepository.findAllByArticleId(articleId)).thenReturn(List.of(existingArticleTag));
+            when(articlePlaceRepository.findAllByArticleId(articleId)).thenReturn(List.of());
+
+            // when
+            adminArticleService.update(articleId, request);
+
+            // then
+            verify(articleTagRepository, times(1)).deleteAll(List.of());
+            verify(tagRepository, never()).findAllByNameIn(any());
+            verify(articleTagRepository, never()).save(any(ArticleTag.class));
+        }
+
+        @DisplayName("요청에서 빠진 태그는 삭제하고, 새로 추가된 태그만 저장하며, 유지되는 태그는 건드리지 않는다")
+        @Test
+        void update4() {
+            // given
+            Long articleId = 1L;
+            Article article = ArticleFixture.createWithId(articleId, null);
+            AdminArticleUpdateRequest request = new AdminArticleUpdateRequest(
+                    "새 제목", "새 부제목", "새 본문", null, true, List.of("여행", "행복"), List.of()
+            );
+
+            Tag keepTag = new Tag("여행");
+            ReflectionTestUtils.setField(keepTag, "id", 10L);
+            Tag removedTag = new Tag("바다");
+            ReflectionTestUtils.setField(removedTag, "id", 11L);
+            ArticleTag keepArticleTag = new ArticleTag(article, keepTag);
+            ArticleTag removedArticleTag = new ArticleTag(article, removedTag);
+
+            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+            when(articleTagRepository.findAllByArticleId(articleId))
+                    .thenReturn(List.of(keepArticleTag, removedArticleTag));
+            when(articlePlaceRepository.findAllByArticleId(articleId)).thenReturn(List.of());
+            when(tagRepository.findAllByNameIn(List.of("행복"))).thenReturn(List.of());
+            when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> {
+                Tag tag = invocation.getArgument(0);
+                ReflectionTestUtils.setField(tag, "id", 12L);
+                return tag;
+            });
+
+            // when
+            adminArticleService.update(articleId, request);
+
+            // then
+            verify(articleTagRepository, times(1)).deleteAll(List.of(removedArticleTag));
+            verify(tagRepository, times(1)).save(argThat(tag -> tag.getName().equals("행복")));
+            verify(articleTagRepository, times(1)).save(argThat(
+                    articleTag -> articleTag.getTag().getName().equals("행복")));
         }
     }
 

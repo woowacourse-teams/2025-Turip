@@ -1,6 +1,7 @@
 package turip.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,8 +68,8 @@ public class AdminArticleService {
         );
         articleRepository.save(article);
 
-        saveArticleTags(article, request.tagNames());
-        saveArticlePlaces(article, request.placeIds());
+        updateArticleTags(article, request.tagNames());
+        updateArticlePlaces(article, request.placeIds());
 
         return article.getId();
     }
@@ -114,10 +115,8 @@ public class AdminArticleService {
         article.update(request.title(), request.subtitle(), request.content(), request.thumbnailUrl(),
                 request.isPublished());
 
-        articleTagRepository.deleteAllByArticleId(articleId);
-        articlePlaceRepository.deleteAllByArticleId(articleId);
-        saveArticleTags(article, request.tagNames());
-        saveArticlePlaces(article, request.placeIds());
+        updateArticleTags(article, request.tagNames());
+        updateArticlePlaces(article, request.placeIds());
 
         List<String> tagNames = articleTagRepository.findAllByArticleId(articleId).stream()
                 .map(articleTag -> articleTag.getTag().getName())
@@ -157,23 +156,54 @@ public class AdminArticleService {
         }
     }
 
-    private void saveArticleTags(Article article, List<String> tagNames) {
-        if (tagNames.isEmpty()) {
+    private void updateArticleTags(Article article, List<String> tagNames) {
+        Set<String> requestedTagNames = new HashSet<>(tagNames);
+
+        List<ArticleTag> existingArticleTags = articleTagRepository.findAllByArticleId(article.getId());
+        Map<String, ArticleTag> existingArticleTagsByTagName = existingArticleTags.stream()
+                .collect(Collectors.toMap(articleTag -> articleTag.getTag().getName(), articleTag -> articleTag));
+
+        List<ArticleTag> articleTagsToDelete = existingArticleTags.stream()
+                .filter(articleTag -> !requestedTagNames.contains(articleTag.getTag().getName()))
+                .toList();
+        articleTagRepository.deleteAll(articleTagsToDelete);
+
+        Set<String> tagNamesToAdd = new HashSet<>(requestedTagNames);
+        tagNamesToAdd.removeAll(existingArticleTagsByTagName.keySet());
+        if (tagNamesToAdd.isEmpty()) {
             return;
         }
 
-        Map<String, Tag> existingTagsByName = tagRepository.findAllByNameIn(tagNames).stream()
+        Map<String, Tag> existingTagsByName = tagRepository.findAllByNameIn(new ArrayList<>(tagNamesToAdd)).stream()
                 .collect(Collectors.toMap(Tag::getName, tag -> tag));
 
-        for (String tagName : tagNames) {
+        for (String tagName : tagNamesToAdd) {
             Tag tag = existingTagsByName.computeIfAbsent(tagName, name -> tagRepository.save(new Tag(name)));
             articleTagRepository.save(new ArticleTag(article, tag));
         }
     }
 
-    private void saveArticlePlaces(Article article, List<Long> placeIds) {
-        List<Place> places = placeRepository.findAllById(placeIds);
-        for (Place place : places) {
+    private void updateArticlePlaces(Article article, List<Long> placeIds) {
+        Set<Long> requestedPlaceIds = new HashSet<>(placeIds);
+
+        List<ArticlePlace> existingArticlePlaces = articlePlaceRepository.findAllByArticleId(article.getId());
+        Set<Long> existingPlaceIds = existingArticlePlaces.stream()
+                .map(articlePlace -> articlePlace.getPlace().getId())
+                .collect(Collectors.toSet());
+
+        List<ArticlePlace> articlePlacesToDelete = existingArticlePlaces.stream()
+                .filter(articlePlace -> !requestedPlaceIds.contains(articlePlace.getPlace().getId()))
+                .toList();
+        articlePlaceRepository.deleteAll(articlePlacesToDelete);
+
+        Set<Long> placeIdsToAdd = new HashSet<>(requestedPlaceIds);
+        placeIdsToAdd.removeAll(existingPlaceIds);
+        if (placeIdsToAdd.isEmpty()) {
+            return;
+        }
+
+        List<Place> placesToAdd = placeRepository.findAllById(new ArrayList<>(placeIdsToAdd));
+        for (Place place : placesToAdd) {
             articlePlaceRepository.save(new ArticlePlace(article, place));
         }
     }
