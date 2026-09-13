@@ -2,15 +2,9 @@ name: Prod Admin CI/CD
 
 on:
   push:
-    branches: [ 'release-be' ]
-    paths:
-      - 'backend/turip-admin/**'
-      - 'backend/build.gradle'
+    branches: [ 'release-be-2' ]
   pull_request:
-    branches: [ 'release-be' ]
-    paths:
-      - 'backend/turip-admin/**'
-      - 'backend/build.gradle'
+    branches: [ 'release-be-2' ]
 
 env:
   DOCKER_IMAGE_REPO: teamturip/turip-backend
