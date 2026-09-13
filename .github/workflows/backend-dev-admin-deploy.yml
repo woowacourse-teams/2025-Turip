@@ -2,7 +2,15 @@ name: Dev Admin CI/CD
 
 on:
   push:
-    branches: [ release-be-2 ]
+    branches: [ develop ]
+    paths:
+      - 'backend/turip-admin/**'
+      - 'backend/build.gradle'
+  pull_request:
+    branches: [ develop ]
+    paths:
+      - 'backend/turip-admin/**'
+      - 'backend/build.gradle'
   workflow_dispatch:
     inputs:
       image_tag:
