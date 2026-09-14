@@ -3,8 +3,10 @@ package com.on.turip.feature.home.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.data.session.SessionManager
+import com.on.turip.core.domain.repository.ArticleRepository
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.domain.repository.RegionRepository
+import com.on.turip.core.model.article.ArticlesResult
 import com.on.turip.core.model.content.UsersLikeContent
 import com.on.turip.core.model.region.PopularDestination
 import com.on.turip.core.model.region.RegionCategory
@@ -15,7 +17,9 @@ import com.on.turip.core.model.result.onSuccess
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
 import com.on.turip.core.ui.error.toUiError
+import com.on.turip.feature.home.impl.model.toUiModel
 import io.github.aakira.napier.Napier
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +33,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val regionRepository: RegionRepository,
     private val contentRepository: ContentRepository,
+    private val articleRepository: ArticleRepository,
     private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Idle)
@@ -40,6 +45,7 @@ class HomeViewModel(
     init {
         loadContents()
         loadPopularDestinations()
+        loadArticles()
     }
 
     /**
@@ -144,6 +150,31 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * 매거진은 홈의 보조 콘텐츠라 실패해도 홈 전체를 에러 화면으로 바꾸지 않는다.
+     * 목록이 비면 섹션 자체가 그려지지 않는다.
+     */
+    fun loadArticles() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isArticlesLoading = true) }
+
+            articleRepository
+                .loadArticles(size = HOME_ARTICLES_SIZE)
+                .onSuccess { result: ArticlesResult ->
+                    _uiState.update { state: HomeUiState ->
+                        state.copy(
+                            articles = result.articles.map { it.toUiModel() }.toImmutableList(),
+                            isArticlesLoading = false,
+                        )
+                    }
+                    Napier.d("매거진 아티클 조회: ${result.articles.size}건")
+                }.onFailure { errorType: ErrorType ->
+                    _uiState.update { it.copy(isArticlesLoading = false) }
+                    Napier.e("매거진 아티클 조회 실패: $errorType")
+                }
+        }
+    }
+
     private suspend fun handleGlobalError(uiError: UiError) {
         if (uiError is UiError.Global) {
             when (uiError) {
@@ -166,5 +197,12 @@ class HomeViewModel(
                 }
             }
         }
+    }
+
+    companion object {
+        /**
+         * 홈 매거진은 가로 스크롤 캐러셀이라 첫 페이지 몇 장이면 충분하다.
+         */
+        private const val HOME_ARTICLES_SIZE: Int = 5
     }
 }

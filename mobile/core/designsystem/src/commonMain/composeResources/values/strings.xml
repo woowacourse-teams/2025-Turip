@@ -258,7 +258,7 @@
     <string name="invitation_failure_dialog_dismiss_login">로그인으로 가기</string>
 
     <!-- 인기 관광지 지도 -->
-    <string name="home_popular_region_cta">🗺️ 요즘 뜨는 여행지</string>
+    <string name="home_popular_region_cta">요즘 뜨는 여행지</string>
     <string name="home_popular_region_cta_map">지도로 전체보기</string>
     <string name="home_popular_region_cta_visitor">%s 명이 다녀갔어요</string>
     <string name="popular_region_title">%s 인기 관광지</string>
@@ -282,5 +282,13 @@
     <string name="popular_region_bookmark_description">북마크</string>
     <string name="region_briefing_visitor_label">%s 방문자 수</string>
     <string name="region_briefing_empty_video">아직 이 지역의 영상이 없어요</string>
+    <string name="home_magazine_title">📖 튜립 매거진</string>
+    <string name="home_magazine_more">전체보기</string>
+    <string name="home_magazine_more_description">매거진 전체보기</string>
+    <string name="article_detail_places_title">이 아티클의 장소</string>
+    <string name="article_detail_place_map_description">지도에서 보기</string>
+    <string name="article_author_withdrawn">탈퇴한 사용자</string>
+    <string name="article_detail_not_found">사라진 아티클이에요</string>
+    <string name="article_detail_not_found_description">삭제되었거나 공개되지 않은 아티클입니다</string>
 
 </resources>

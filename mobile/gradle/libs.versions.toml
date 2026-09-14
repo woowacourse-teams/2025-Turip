@@ -163,6 +163,7 @@ kmp-sharing = { module = "com.swmansion.kmpsharing:kmp-sharing", version.ref = "
 # Markdown
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
+multiplatform-markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "multiplatformMarkdownRenderer" }
 
 # Firebase
 firebase-installations = { group = "com.google.firebase", name = "firebase-installations-ktx", version.ref = "firebase-installations" }
