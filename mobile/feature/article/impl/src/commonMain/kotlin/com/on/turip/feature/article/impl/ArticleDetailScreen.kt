@@ -88,6 +88,8 @@ private fun ArticleDetailContent(
         val heroHeightPx: Float = with(LocalDensity.current) { (maxWidth * HERO_HEIGHT_RATIO).toPx() }
 
         // 히어로가 리스트 0번이므로, 그 위를 지나가기 전까지는 첫 아이템의 스크롤 오프셋이 곧 진행도가 된다.
+        // 본문이 짧아 히어로 높이만큼 스크롤할 수 없는 경우에는 실제 스크롤 가능한 거리를 기준으로 삼아
+        // 리스트 끝에 닿으면 항상 1이 되도록 한다.
         val scrollProgress: Float by remember(heroHeightPx) {
             derivedStateOf {
                 val scrolled: Float =
@@ -96,7 +98,9 @@ private fun ArticleDetailContent(
                     } else {
                         listState.firstVisibleItemScrollOffset.toFloat()
                     }
-                if (heroHeightPx <= 0f) 0f else (scrolled / heroHeightPx).coerceIn(0f, 1f)
+                val maxScrollable: Float = listState.maxScrollablePx()?.let { scrolled + it } ?: heroHeightPx
+                val threshold: Float = minOf(heroHeightPx, maxScrollable)
+                if (threshold <= 0f) 0f else (scrolled / threshold).coerceIn(0f, 1f)
             }
         }
 
@@ -158,6 +162,17 @@ private fun ArticleDetailContent(
             )
         }
     }
+}
+
+/**
+ * 마지막 아이템이 화면에 보일 때, 리스트 끝까지 남은 스크롤 거리(px). 아직 안 보이면 null.
+ */
+private fun LazyListState.maxScrollablePx(): Float? {
+    val info = layoutInfo
+    val last = info.visibleItemsInfo.lastOrNull() ?: return null
+    if (last.index != info.totalItemsCount - 1) return null
+    val contentEnd: Int = last.offset + last.size + info.afterContentPadding
+    return (contentEnd - info.viewportEndOffset).coerceAtLeast(0).toFloat()
 }
 
 @Preview(showBackground = true)
