@@ -32,6 +32,7 @@ import com.on.turip.core.designsystem.component.TuripSnackbar
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.navigation.Navigator
+import com.on.turip.core.navigation.SCREEN_TRANSITION_DURATION_MILLIS
 import com.on.turip.core.navigation.rememberNavigationState
 import com.on.turip.core.navigation.toEntries
 import com.on.turip.feature.home.api.HomeNavKey
@@ -102,7 +103,7 @@ fun MainApp(
         if (appState.shouldShowBottomBar) {
             val isFromAuthScreen = prevKey is SplashNavKey || prevKey is LoginNavKey
             if (isFromAuthScreen) {
-                delay(SCREEN_TRANSITION_DURATION_MS)
+                delay(SCREEN_TRANSITION_DURATION_MILLIS.toLong())
             }
         }
         prevKey = appState.currentScreenKey
@@ -183,10 +184,8 @@ fun MainApp(
     }
 }
 
-private const val SCREEN_TRANSITION_DURATION_MS = 300L
-
 private fun fadeTransition(): ContentTransform =
     ContentTransform(
-        targetContentEnter = fadeIn(animationSpec = tween(durationMillis = 300)),
-        initialContentExit = fadeOut(animationSpec = tween(durationMillis = 300)),
+        targetContentEnter = fadeIn(animationSpec = tween(durationMillis = SCREEN_TRANSITION_DURATION_MILLIS)),
+        initialContentExit = fadeOut(animationSpec = tween(durationMillis = SCREEN_TRANSITION_DURATION_MILLIS)),
     )

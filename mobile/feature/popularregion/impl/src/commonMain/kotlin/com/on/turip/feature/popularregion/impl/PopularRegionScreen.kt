@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.navigation.SCREEN_TRANSITION_DURATION_MILLIS
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.util.baseMonthText
@@ -51,8 +52,10 @@ import com.on.turip.feature.popularregion.impl.component.PopularRegionMapBadge
 import com.on.turip.feature.popularregion.impl.component.PopularRegionMapHint
 import com.on.turip.feature.popularregion.impl.component.PopularRegionSheetContent
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun PopularRegionScreen(
@@ -66,7 +69,12 @@ fun PopularRegionScreen(
 ) {
     val uiState: PopularRegionState by viewModel.uiState.collectAsState()
 
+    // 지도가 캐시로 곧장 준비되면 시트가 화면 전환 fade·지도 첫 그리기와 같은 프레임에 올라오기 시작해 끊긴다.
+    // 전환이 끝나고 첫 프레임이 자리 잡은 뒤에 고르면 그 둘이 빠져 부드럽다.
+    // 처음 진입해 네트워크를 기다리는 경우는 어차피 그보다 늦게 준비되므로 이 지연이 체감되지 않는다.
     LaunchedEffect(initialRegionCategoryName) {
+        if (initialRegionCategoryName == null) return@LaunchedEffect
+        delay(INITIAL_SELECTION_DELAY_MILLIS.milliseconds)
         viewModel.setInitialRegion(initialRegionCategoryName)
     }
 
@@ -321,6 +329,13 @@ private fun MapHintOverlay(
 }
 
 /** 내비게이션 바 높이를 뺀, 시트가 기본으로 보여줄 내용 높이 */
+
+/** 지도 첫 프레임(폴리곤 Path 생성)이 화면 전환 직후에 그려지므로, 그 프레임까지 지나 보낼 여유 */
+private const val MAP_FIRST_FRAME_MARGIN_MILLIS: Long = 50L
+
+/** 화면 전환이 끝나고 지도 첫 프레임까지 자리 잡을 시간 */
+private const val INITIAL_SELECTION_DELAY_MILLIS: Long =
+    SCREEN_TRANSITION_DURATION_MILLIS + MAP_FIRST_FRAME_MARGIN_MILLIS
 private val SHEET_PEEK_HEIGHT = 360.dp
 
 private const val SHEET_CONTENT_FADE_MILLIS: Int = 220
