@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.navigation.SCREEN_TRANSITION_DURATION_MILLIS
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.util.baseMonthText
@@ -51,11 +52,14 @@ import com.on.turip.feature.popularregion.impl.component.PopularRegionMapBadge
 import com.on.turip.feature.popularregion.impl.component.PopularRegionMapHint
 import com.on.turip.feature.popularregion.impl.component.PopularRegionSheetContent
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun PopularRegionScreen(
+    initialRegionCategoryName: String?,
     onBackClick: () -> Unit,
     onRegionBriefingClick: (regionCategoryName: String, visitorCount: Long, baseMonth: String?) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
@@ -64,6 +68,15 @@ fun PopularRegionScreen(
     viewModel: PopularRegionViewModel = koinViewModel(),
 ) {
     val uiState: PopularRegionState by viewModel.uiState.collectAsState()
+
+    // 지도가 캐시로 곧장 준비되면 시트가 화면 전환 fade·지도 첫 그리기와 같은 프레임에 올라오기 시작해 끊긴다.
+    // 전환이 끝나고 첫 프레임이 자리 잡은 뒤에 고르면 그 둘이 빠져 부드럽다.
+    // 처음 진입해 네트워크를 기다리는 경우는 어차피 그보다 늦게 준비되므로 이 지연이 체감되지 않는다.
+    LaunchedEffect(initialRegionCategoryName) {
+        if (initialRegionCategoryName == null) return@LaunchedEffect
+        delay(INITIAL_SELECTION_DELAY_MILLIS.milliseconds)
+        viewModel.setInitialRegion(initialRegionCategoryName)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect: PopularRegionEffect ->
@@ -147,8 +160,21 @@ private fun PopularRegionContent(
         }
 
     // 사용자가 시트를 아래로 끌어 내린 경우에도 선택 상태를 함께 비운다.
+    //
+    // 시트의 첫 상태도 Hidden 이라 그대로 두면 진입 직후 한 번 닫힘으로 잡힌다.
+    // 특정 지역을 고르고 들어와 지도가 캐시로 곧장 준비되면, 방금 건 선택을 이 효과가 도로 지워 시트가 뜨지 않는다.
+    // 그래서 한 번이라도 열리기 시작한 뒤의 Hidden 만 닫힘으로 본다.
+    //
+    // "열리기 시작"은 currentValue 가 아니라 targetValue 로 잡는다. currentValue 는 올라오는 애니메이션이
+    // 끝나야 바뀌는데, 그 사이에 사용자가 시트를 도로 끌어 내리면 열린 적이 없는 것으로 남아 선택이 안 풀린다.
+    var hasSheetOpened: Boolean by remember { mutableStateOf(false) }
+    LaunchedEffect(scaffoldState.bottomSheetState.targetValue) {
+        if (scaffoldState.bottomSheetState.targetValue != SheetValue.Hidden) {
+            hasSheetOpened = true
+        }
+    }
     LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
-        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Hidden) {
+        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Hidden && hasSheetOpened) {
             onIntent(PopularRegionIntent.DismissSheet)
         }
     }
@@ -303,6 +329,13 @@ private fun MapHintOverlay(
 }
 
 /** 내비게이션 바 높이를 뺀, 시트가 기본으로 보여줄 내용 높이 */
+
+/** 지도 첫 프레임(폴리곤 Path 생성)이 화면 전환 직후에 그려지므로, 그 프레임까지 지나 보낼 여유 */
+private const val MAP_FIRST_FRAME_MARGIN_MILLIS: Long = 50L
+
+/** 화면 전환이 끝나고 지도 첫 프레임까지 자리 잡을 시간 */
+private const val INITIAL_SELECTION_DELAY_MILLIS: Long =
+    SCREEN_TRANSITION_DURATION_MILLIS + MAP_FIRST_FRAME_MARGIN_MILLIS
 private val SHEET_PEEK_HEIGHT = 360.dp
 
 private const val SHEET_CONTENT_FADE_MILLIS: Int = 220

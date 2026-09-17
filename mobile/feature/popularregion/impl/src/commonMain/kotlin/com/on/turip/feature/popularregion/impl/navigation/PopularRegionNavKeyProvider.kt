@@ -17,8 +17,9 @@ class PopularRegionNavKeyProvider : NavKeyProvider {
     }
 
     override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        entry<PopularRegionNavKey> {
+        entry<PopularRegionNavKey> { key: PopularRegionNavKey ->
             PopularRegionScreen(
+                initialRegionCategoryName = key.initialRegionCategoryName,
                 onBackClick = navigator::goBack,
                 onRegionBriefingClick = { regionCategoryName, visitorCount, baseMonth ->
                     navigator.navigate(
