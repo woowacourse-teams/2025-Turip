@@ -290,5 +290,8 @@
     <string name="article_author_withdrawn">탈퇴한 사용자</string>
     <string name="article_detail_not_found">사라진 아티클이에요</string>
     <string name="article_detail_not_found_description">삭제되었거나 공개되지 않은 아티클입니다</string>
+    <string name="article_list_title">튜립 매거진</string>
+    <string name="article_list_empty">아직 등록된 아티클이 없어요</string>
+    <string name="article_list_load_more_fail_title">아티클을 불러올 수 없습니다. 잠시 후 재시도 해주세요</string>
 
 </resources>

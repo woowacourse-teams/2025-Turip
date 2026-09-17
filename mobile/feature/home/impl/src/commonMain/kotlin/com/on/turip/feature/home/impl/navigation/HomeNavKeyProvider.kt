@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import com.on.turip.core.navigation.NavKeyProvider
 import com.on.turip.core.navigation.Navigator
 import com.on.turip.feature.article.api.ArticleDetailNavKey
+import com.on.turip.feature.article.api.ArticleListNavKey
 import com.on.turip.feature.home.api.HomeNavKey
 import com.on.turip.feature.home.impl.HomeScreen
 import com.on.turip.feature.login.api.LoginNavKey
@@ -29,8 +30,7 @@ class HomeNavKeyProvider : NavKeyProvider {
                 onRandomTravelClick = { navigator.navigate(RandomTravelNavKey) },
                 onPopularRegionClick = { navigator.navigate(PopularRegionNavKey) },
                 onArticleClick = { articleId -> navigator.navigate(ArticleDetailNavKey(articleId)) },
-                // 매거진 전체보기 목록 화면은 아직 정의되지 않아 연결하지 않는다.
-                onMagazineMoreClick = {},
+                onMagazineMoreClick = { navigator.navigate(ArticleListNavKey) },
                 onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey()) },
             )
         }
