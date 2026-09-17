@@ -267,8 +267,8 @@ private fun HomeSuccessPreview() {
             errorUiState = ErrorUiState.None,
             popularDestinations =
                 listOf(
-                    PopularDestinationModel(rank = 1, regionCategoryName = "서울", visitorCountText = "2847만"),
-                    PopularDestinationModel(rank = 2, regionCategoryName = "부산", visitorCountText = "1204만"),
+                    PopularDestinationModel(rank = 1, regionCategoryName = "서울", imageUrl = null, visitorCountText = "2847만"),
+                    PopularDestinationModel(rank = 2, regionCategoryName = "부산", imageUrl = null, visitorCountText = "1204만"),
                 ),
         )
     TuripTheme {

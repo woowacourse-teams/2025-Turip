@@ -8,6 +8,7 @@ import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.model.article.ArticlesResult
 import com.on.turip.core.model.content.UsersLikeContent
+import com.on.turip.core.model.region.DestinationVisitor
 import com.on.turip.core.model.region.PopularDestination
 import com.on.turip.core.model.region.RegionCategory
 import com.on.turip.core.model.result.ErrorType
@@ -42,6 +43,19 @@ class HomeViewModel(
     private val _uiEffect: Channel<HomeUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<HomeUiEffect> = _uiEffect.receiveAsFlow()
 
+    /**
+     * 인기 관광지 조회 결과 원본. 지역 이미지가 나중에 도착해도 다시 붙일 수 있도록 들고 있는다.
+     */
+    private var popularVisitors: List<DestinationVisitor> = emptyList()
+
+    /**
+     * 지역 카테고리명 → 이미지 URL.
+     *
+     * 인기 관광지 응답에는 이미지가 없어서 지역 카테고리 목록에서 이름으로 찾아 붙인다.
+     * 국내/해외를 오가며 목록이 바뀌어도 한 번 본 이미지는 잊지 않도록 덮어쓰지 않고 누적한다.
+     */
+    private val regionImageUrls: MutableMap<String, String> = mutableMapOf()
+
     init {
         loadContents()
         loadPopularDestinations()
@@ -59,15 +73,30 @@ class HomeViewModel(
             regionRepository
                 .loadPopularDestinations()
                 .onSuccess { popularDestination: PopularDestination ->
-                    _uiState.update { state: HomeUiState ->
-                        state.copy(
-                            popularDestinations = popularDestination.destinations.map { it.toUiModel() },
-                        )
-                    }
+                    popularVisitors = popularDestination.destinations
+                    publishPopularDestinations()
                     Napier.d("인기 관광지 조회: ${popularDestination.destinations}")
                 }.onFailure {
                     Napier.e("인기 관광지 조회 실패")
                 }
+        }
+    }
+
+    private fun rememberRegionImages(regionCategories: List<RegionCategory>) {
+        regionCategories.forEach { regionCategory: RegionCategory ->
+            regionImageUrls[regionCategory.name] = regionCategory.imageUrl
+        }
+        publishPopularDestinations()
+    }
+
+    private fun publishPopularDestinations() {
+        _uiState.update { state: HomeUiState ->
+            state.copy(
+                popularDestinations =
+                    popularVisitors.map { visitor: DestinationVisitor ->
+                        visitor.toUiModel(imageUrl = regionImageUrls[visitor.regionCategoryName])
+                    },
+            )
         }
     }
 
@@ -105,6 +134,7 @@ class HomeViewModel(
                     errorUiState = ErrorUiState.None,
                 )
             }
+            rememberRegionImages(regionCategories)
 
             Napier.d("인기 북마크 목록: $usersLikeContents")
             Napier.d("지역 카테고리 조회: $regionCategories")
@@ -139,6 +169,7 @@ class HomeViewModel(
                             errorUiState = ErrorUiState.None,
                         )
                     }
+                    rememberRegionImages(regionCategories)
                     Napier.d("지역 카테고리 조회: $regionCategories")
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {

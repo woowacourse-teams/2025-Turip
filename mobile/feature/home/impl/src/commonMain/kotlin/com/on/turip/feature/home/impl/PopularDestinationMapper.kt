@@ -4,10 +4,11 @@ import com.on.turip.core.model.region.DestinationVisitor
 import com.on.turip.feature.home.impl.model.PopularDestinationModel
 import kotlin.math.round
 
-fun DestinationVisitor.toUiModel(): PopularDestinationModel =
+fun DestinationVisitor.toUiModel(imageUrl: String?): PopularDestinationModel =
     PopularDestinationModel(
         rank = rank,
         regionCategoryName = regionCategoryName,
+        imageUrl = imageUrl,
         visitorCountText = visitorCount.toManUnitText(),
     )
 
