@@ -28,7 +28,10 @@ class HomeNavKeyProvider : NavKeyProvider {
                 onRegionClick = { regionName -> navigator.navigate(RegionResultNavKey(regionName)) },
                 onContentClick = { contentId -> navigator.navigate(TripDetailNavKey(contentId)) },
                 onRandomTravelClick = { navigator.navigate(RandomTravelNavKey) },
-                onPopularRegionClick = { navigator.navigate(PopularRegionNavKey) },
+                onPopularRegionClick = { navigator.navigate(PopularRegionNavKey()) },
+                onPopularDestinationClick = { regionCategoryName ->
+                    navigator.navigate(PopularRegionNavKey(initialRegionCategoryName = regionCategoryName))
+                },
                 onArticleClick = { articleId -> navigator.navigate(ArticleDetailNavKey(articleId)) },
                 onMagazineMoreClick = { navigator.navigate(ArticleListNavKey) },
                 onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey()) },

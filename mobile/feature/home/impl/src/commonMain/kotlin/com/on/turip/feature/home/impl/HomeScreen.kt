@@ -61,6 +61,7 @@ fun HomeScreen(
     onContentClick: (contentId: Long) -> Unit,
     onRandomTravelClick: () -> Unit,
     onPopularRegionClick: () -> Unit,
+    onPopularDestinationClick: (regionCategoryName: String) -> Unit,
     onArticleClick: (articleId: Long) -> Unit,
     onMagazineMoreClick: () -> Unit,
     onNavigateToLoginScreen: () -> Unit,
@@ -112,6 +113,7 @@ fun HomeScreen(
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
             onRandomTravelClick = viewModel::clickRandomTravel,
             onPopularRegionClick = onPopularRegionClick,
+            onPopularDestinationClick = onPopularDestinationClick,
             onArticleClick = onArticleClick,
             onMagazineMoreClick = onMagazineMoreClick,
         )
@@ -128,6 +130,7 @@ private fun HomeScreenContent(
     onDomesticClick: (isDomestic: Boolean) -> Unit,
     onRandomTravelClick: () -> Unit,
     onPopularRegionClick: () -> Unit,
+    onPopularDestinationClick: (regionCategoryName: String) -> Unit,
     onArticleClick: (articleId: Long) -> Unit,
     onMagazineMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -207,7 +210,8 @@ private fun HomeScreenContent(
 
                 PopularRegionCtaButton(
                     destinations = uiState.popularDestinations,
-                    onClick = onPopularRegionClick,
+                    onDestinationClick = onPopularDestinationClick,
+                    onMoreClick = onPopularRegionClick,
                 )
 
                 RegionTypeButtons(
@@ -247,6 +251,7 @@ private fun HomeLoadingPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onPopularDestinationClick = {},
                 onArticleClick = {},
                 onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
@@ -282,6 +287,7 @@ private fun HomeSuccessPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onPopularDestinationClick = {},
                 onArticleClick = {},
                 onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
@@ -305,6 +311,7 @@ private fun HomeServerErrorPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onPopularDestinationClick = {},
                 onArticleClick = {},
                 onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
@@ -328,6 +335,7 @@ private fun HomeNetworkErrorPreview() {
                 onDomesticClick = {},
                 onRandomTravelClick = {},
                 onPopularRegionClick = {},
+                onPopularDestinationClick = {},
                 onArticleClick = {},
                 onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),

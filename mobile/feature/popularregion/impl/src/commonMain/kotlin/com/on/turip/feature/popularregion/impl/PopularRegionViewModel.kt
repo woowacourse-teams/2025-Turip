@@ -15,6 +15,7 @@ import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
 import com.on.turip.core.ui.error.toUiError
 import com.on.turip.feature.popularregion.impl.map.PopularDestinationShapes
+import com.on.turip.feature.popularregion.impl.map.RegionShapeKey
 import com.on.turip.feature.popularregion.impl.map.SidoAreas
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
 import com.on.turip.feature.popularregion.impl.model.RegionContentModel
@@ -53,8 +54,37 @@ class PopularRegionViewModel(
     private var loadJob: Job? = null
     private var contentsJob: Job? = null
 
+    /**
+     * 진입하자마자 선택해 둘 지역 카테고리명.
+     *
+     * 지도를 다 받기 전에는 고를 수 없어서 들고 있다가 [loadRegions] 가 끝날 때 한 번 쓰고 비운다.
+     */
+    private var pendingInitialRegionCategoryName: String? = null
+
+    /**
+     * 초기 선택은 화면 수명 동안 한 번만 받는다.
+     *
+     * 화면은 상세로 갔다 돌아오거나 회전할 때마다 다시 구성되며 그때마다 [setInitialRegion] 을 부른다.
+     * 막지 않으면 사용자가 시트를 내렸거나 다른 지역을 골라 둔 것이 처음 지역으로 되돌아간다.
+     */
+    private var hasReceivedInitialRegion: Boolean = false
+
     init {
         loadRegions()
+    }
+
+    /**
+     * 홈 CTA 카드처럼 특정 지역을 고르고 들어온 경우, 지도가 준비되면 그 지역을 탭한 것과 같은 상태로 만든다.
+     * 이미 지도가 떠 있으면 바로 고른다.
+     */
+    fun setInitialRegion(regionCategoryName: String?) {
+        if (regionCategoryName == null || hasReceivedInitialRegion) return
+        hasReceivedInitialRegion = true
+        if (currentState.isLoading) {
+            pendingInitialRegionCategoryName = regionCategoryName
+            return
+        }
+        selectRegion(RegionShapeKey.Destination(regionCategoryName).code)
     }
 
     override fun onIntent(intent: PopularRegionIntent) {
@@ -158,7 +188,16 @@ class PopularRegionViewModel(
                         errorUiState = ErrorUiState.None,
                     )
                 }
+
+                applyPendingInitialRegion()
             }
+    }
+
+    private fun applyPendingInitialRegion() {
+        val regionCategoryName: String = pendingInitialRegionCategoryName ?: return
+        pendingInitialRegionCategoryName = null
+        // 지도에 없는 이름이면 selectRegion 이 조용히 무시한다. 빈 지도로 남는 게 맞다.
+        selectRegion(RegionShapeKey.Destination(regionCategoryName).code)
     }
 
     /**

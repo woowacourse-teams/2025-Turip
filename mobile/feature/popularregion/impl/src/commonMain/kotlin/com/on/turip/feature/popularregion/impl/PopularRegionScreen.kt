@@ -56,6 +56,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun PopularRegionScreen(
+    initialRegionCategoryName: String?,
     onBackClick: () -> Unit,
     onRegionBriefingClick: (regionCategoryName: String, visitorCount: Long, baseMonth: String?) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
@@ -64,6 +65,10 @@ fun PopularRegionScreen(
     viewModel: PopularRegionViewModel = koinViewModel(),
 ) {
     val uiState: PopularRegionState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(initialRegionCategoryName) {
+        viewModel.setInitialRegion(initialRegionCategoryName)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect: PopularRegionEffect ->
@@ -147,8 +152,21 @@ private fun PopularRegionContent(
         }
 
     // 사용자가 시트를 아래로 끌어 내린 경우에도 선택 상태를 함께 비운다.
+    //
+    // 시트의 첫 상태도 Hidden 이라 그대로 두면 진입 직후 한 번 닫힘으로 잡힌다.
+    // 특정 지역을 고르고 들어와 지도가 캐시로 곧장 준비되면, 방금 건 선택을 이 효과가 도로 지워 시트가 뜨지 않는다.
+    // 그래서 한 번이라도 열리기 시작한 뒤의 Hidden 만 닫힘으로 본다.
+    //
+    // "열리기 시작"은 currentValue 가 아니라 targetValue 로 잡는다. currentValue 는 올라오는 애니메이션이
+    // 끝나야 바뀌는데, 그 사이에 사용자가 시트를 도로 끌어 내리면 열린 적이 없는 것으로 남아 선택이 안 풀린다.
+    var hasSheetOpened: Boolean by remember { mutableStateOf(false) }
+    LaunchedEffect(scaffoldState.bottomSheetState.targetValue) {
+        if (scaffoldState.bottomSheetState.targetValue != SheetValue.Hidden) {
+            hasSheetOpened = true
+        }
+    }
     LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
-        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Hidden) {
+        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Hidden && hasSheetOpened) {
             onIntent(PopularRegionIntent.DismissSheet)
         }
     }
