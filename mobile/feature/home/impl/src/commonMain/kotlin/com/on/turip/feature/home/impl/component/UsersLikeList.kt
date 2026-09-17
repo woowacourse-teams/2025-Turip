@@ -20,9 +20,16 @@ import com.on.turip.core.model.region.City
 import com.on.turip.core.model.trip.TripDuration
 import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 
+private const val PLACEHOLDER_ITEM_COUNT = 2
+private val ITEM_WIDTH = 280.dp
+
+/**
+ * 로딩 중에는 실제 카드와 같은 규격의 placeholder 를 그려, 응답이 온 뒤 화면이 튀지 않게 한다.
+ */
 @Composable
 fun UsersLikeList(
     usersLikeContents: List<UsersLikeContentModel>,
+    isLoading: Boolean,
     onContentClick: (usersLikeContent: UsersLikeContentModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -30,7 +37,14 @@ fun UsersLikeList(
         modifier = modifier.wrapContentHeight(),
         contentPadding = PaddingValues(end = TuripTheme.spacing.small),
         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+        userScrollEnabled = !isLoading,
     ) {
+        if (isLoading) {
+            items(PLACEHOLDER_ITEM_COUNT) {
+                UsersLikePlaceholderItem(modifier = Modifier.width(ITEM_WIDTH))
+            }
+            return@LazyRow
+        }
         items(
             usersLikeContents,
             key = { it.content.id },
@@ -40,10 +54,11 @@ fun UsersLikeList(
                 regionName = usersLikeContent.content.city.name,
                 title = usersLikeContent.content.videoData.title,
                 channelName = usersLikeContent.content.creator.channelName,
-                contentDescription = "${usersLikeContent.content.videoData.uploadedDate} · ${usersLikeContent.tripDuration.toDisplayText()}",
+                contentDescription =
+                    "${usersLikeContent.content.videoData.uploadedDate} · ${usersLikeContent.tripDuration.toDisplayText()}",
                 modifier =
                     Modifier
-                        .width(280.dp)
+                        .width(ITEM_WIDTH)
                         .clip(TuripTheme.shape.chip)
                         .clickable { onContentClick(usersLikeContent) },
             )
@@ -57,6 +72,19 @@ private fun UsersLikeListPreview() {
     TuripTheme {
         UsersLikeList(
             usersLikeContents = previewUsersLikeContents(),
+            isLoading = false,
+            onContentClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 1000)
+@Composable
+private fun UsersLikeListLoadingPreview() {
+    TuripTheme {
+        UsersLikeList(
+            usersLikeContents = emptyList(),
+            isLoading = true,
             onContentClick = {},
         )
     }
