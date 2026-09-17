@@ -6,6 +6,7 @@ import com.on.turip.core.local.di.localModule
 import com.on.turip.core.network.di.datasourceModule
 import com.on.turip.core.network.di.networkModule
 import com.on.turip.core.network.di.serviceModule
+import com.on.turip.feature.article.impl.di.articleModule
 import com.on.turip.feature.bookmark.impl.di.bookmarkModule
 import com.on.turip.feature.home.impl.di.homeModule
 import com.on.turip.feature.invitation.impl.di.invitationModule
@@ -43,6 +44,7 @@ val featureModule =
             loginModule,
             invitationModule,
             homeModule,
+            articleModule,
             bookmarkModule,
             myPageModule,
             searchModule,

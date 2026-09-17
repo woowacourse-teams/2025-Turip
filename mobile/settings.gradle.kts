@@ -39,6 +39,8 @@ include(":core:designsystem")
 include(":core:navigation")
 include(":core:ui")
 
+include(":feature:article:api")
+include(":feature:article:impl")
 include(":feature:home:api")
 include(":feature:home:impl")
 include(":feature:login:api")

@@ -4,6 +4,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.core.navigation.NavKeyProvider
 import com.on.turip.core.navigation.Navigator
+import com.on.turip.feature.article.api.ArticleDetailNavKey
+import com.on.turip.feature.article.api.ArticleListNavKey
 import com.on.turip.feature.home.api.HomeNavKey
 import com.on.turip.feature.home.impl.HomeScreen
 import com.on.turip.feature.login.api.LoginNavKey
@@ -27,6 +29,8 @@ class HomeNavKeyProvider : NavKeyProvider {
                 onContentClick = { contentId -> navigator.navigate(TripDetailNavKey(contentId)) },
                 onRandomTravelClick = { navigator.navigate(RandomTravelNavKey) },
                 onPopularRegionClick = { navigator.navigate(PopularRegionNavKey) },
+                onArticleClick = { articleId -> navigator.navigate(ArticleDetailNavKey(articleId)) },
+                onMagazineMoreClick = { navigator.navigate(ArticleListNavKey) },
                 onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey()) },
             )
         }
