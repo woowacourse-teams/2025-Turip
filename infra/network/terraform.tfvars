@@ -1,0 +1,5 @@
+region            = "ap-northeast-2"
+aws_profile       = "turip"
+vpc_cidr          = "10.0.0.0/24"
+subnet_cidr       = "10.0.0.0/24"
+availability_zone = "ap-northeast-2a"
