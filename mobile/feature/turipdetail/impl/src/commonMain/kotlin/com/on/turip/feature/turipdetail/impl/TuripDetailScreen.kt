@@ -227,7 +227,7 @@ fun TuripDetailScreen(
                 viewModel.updateScreenMode(turipPlaceScreenMode = screenMode)
             },
             turipNameStatus = uiState.turipNameStatus,
-            turipName = uiState.inputTuripName,
+            initialTuripName = uiState.inputTuripName,
             onNameChanged = viewModel::updateInputName,
             onConfirmClick = viewModel::updateTuripName,
         )

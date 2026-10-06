@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.trip.impl.model.MapModel
 import com.on.turip.feature.trip.impl.model.PlaceModel
@@ -178,6 +179,7 @@ private fun PlaceItemPreview() {
             category = "💻 코딩맛집",
             mapLink = "kakao.com/123123",
             timeLine = "01:03",
+            appleMap = AppleMap.Idle,
         )
     TuripTheme {
         PlaceItem(

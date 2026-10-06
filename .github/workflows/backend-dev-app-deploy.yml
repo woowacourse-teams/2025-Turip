@@ -147,6 +147,9 @@ jobs:
           YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
           KOREA_TOURISM_API_KEY=${{ secrets.KOREA_TOURISM_API_KEY }}
           INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
+          ARTICLE_DEFAULT_THUMBNAIL_URL=${{ secrets.ARTICLE_DEFAULT_THUMBNAIL_URL }}
+          APP_JAVA_XMS=${{ secrets.DEV_APP_JAVA_XMS }}
+          APP_JAVA_XMX=${{ secrets.DEV_APP_JAVA_XMX }}
           EOF
           
           if [ -f .env ]; then

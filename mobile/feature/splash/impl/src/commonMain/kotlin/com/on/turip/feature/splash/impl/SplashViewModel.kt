@@ -95,7 +95,10 @@ class SplashViewModel(
                 sessionManager.switchToMember()
                 fcmTokenRegistrar.register()
             }
-            AuthStatus.UnAuthenticated -> sessionManager.switchToGuest()
+
+            AuthStatus.UnAuthenticated -> {
+                sessionManager.switchToGuest()
+            }
         }
     }
 }

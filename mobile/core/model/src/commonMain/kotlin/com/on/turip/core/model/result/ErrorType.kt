@@ -43,6 +43,13 @@ sealed interface ErrorType {
     }
 
     /**
+     * 아티클에 대한 에러 타입
+     */
+    sealed interface Article : ErrorType {
+        data object NotFound : Article
+    }
+
+    /**
      * 장소에 대한 에러 타입
      */
     sealed interface Place : ErrorType {

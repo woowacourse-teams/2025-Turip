@@ -22,6 +22,8 @@ services:
     environment:
       OTEL_SERVICE_NAME: turip-app
       OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
+      JAVA_XMS: ${APP_JAVA_XMS:-256m}
+      JAVA_XMX: ${APP_JAVA_XMX:-384m}
     networks:
       - turip-network
     volumes:
@@ -38,6 +40,8 @@ services:
     environment:
       OTEL_SERVICE_NAME: turip-app
       OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
+      JAVA_XMS: ${APP_JAVA_XMS:-256m}
+      JAVA_XMX: ${APP_JAVA_XMX:-384m}
     networks:
       - turip-network
     volumes:
@@ -55,6 +59,8 @@ services:
       SERVER_PORT: 8081
       OTEL_SERVICE_NAME: turip-admin
       OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
+      JAVA_XMS: ${ADMIN_JAVA_XMS:-256m}
+      JAVA_XMX: ${ADMIN_JAVA_XMX:-384m}
     networks:
       - turip-network
     volumes:

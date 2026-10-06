@@ -34,6 +34,8 @@ public class TestDataHelper {
         jdbcTemplate.update("DELETE FROM favorite_place");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_folder_account");
+        jdbcTemplate.update("DELETE FROM article_place");
+        jdbcTemplate.update("DELETE FROM article_tag");
 
         jdbcTemplate.update("DELETE FROM content_pending");
         jdbcTemplate.update("DELETE FROM place");
@@ -44,6 +46,8 @@ public class TestDataHelper {
         jdbcTemplate.update("DELETE FROM refresh_token");
         jdbcTemplate.update("DELETE FROM fcm_token");
         jdbcTemplate.update("DELETE FROM member");
+        jdbcTemplate.update("DELETE FROM article");
+        jdbcTemplate.update("DELETE FROM tag");
 
         jdbcTemplate.update("DELETE FROM account");
         jdbcTemplate.update("DELETE FROM content");
@@ -58,6 +62,8 @@ public class TestDataHelper {
         jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE article_place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE article_tag ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content_pending ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
@@ -67,6 +73,8 @@ public class TestDataHelper {
         jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE fcm_token ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE article ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE tag ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE category ALTER COLUMN id RESTART WITH 1");

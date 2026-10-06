@@ -3,7 +3,6 @@ package com.on.turip.feature.home.impl
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,26 +22,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
-import com.on.turip.core.designsystem.component.TuripLoadingIndicator
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.all_close_description
+import com.on.turip.core.designsystem.generated.resources.home_random_travel_unavailable
 import com.on.turip.core.designsystem.generated.resources.home_top_title
 import com.on.turip.core.designsystem.generated.resources.home_users_like_content_title
+import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.feature.home.impl.component.HomeAppBar
+import com.on.turip.feature.home.impl.component.MagazineSection
+import com.on.turip.feature.home.impl.component.PopularRegionCtaButton
+import com.on.turip.feature.home.impl.component.RandomTravelCtaButton
 import com.on.turip.feature.home.impl.component.RegionList
 import com.on.turip.feature.home.impl.component.RegionTypeButtons
 import com.on.turip.feature.home.impl.component.SearchTextField
 import com.on.turip.feature.home.impl.component.UsersLikeList
+import com.on.turip.feature.home.impl.model.PopularDestinationModel
 import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -50,16 +56,36 @@ fun HomeScreen(
     onSearchClick: (keyword: String) -> Unit,
     onRegionClick: (regionName: String) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
+    onRandomTravelClick: () -> Unit,
+    onPopularRegionClick: () -> Unit,
+    onPopularDestinationClick: (regionCategoryName: String) -> Unit,
+    onArticleClick: (articleId: Long) -> Unit,
+    onMagazineMoreClick: () -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsState()
+    val snackbarDelegate = LocalSnackbarDelegate.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                HomeUiEffect.NavigateToLogin -> onNavigateToLoginScreen()
+                HomeUiEffect.NavigateToLogin -> {
+                    onNavigateToLoginScreen()
+                }
+
+                HomeUiEffect.NavigateToRandomTravel -> {
+                    onRandomTravelClick()
+                }
+
+                HomeUiEffect.ShowRandomTravelUnavailable -> {
+                    snackbarDelegate.showSnackbar(
+                        message = getString(Res.string.home_random_travel_unavailable),
+                        actionLabel = getString(Res.string.all_close_description),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
             }
         }
     }
@@ -82,6 +108,11 @@ fun HomeScreen(
             },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
+            onRandomTravelClick = viewModel::clickRandomTravel,
+            onPopularRegionClick = onPopularRegionClick,
+            onPopularDestinationClick = onPopularDestinationClick,
+            onArticleClick = onArticleClick,
+            onMagazineMoreClick = onMagazineMoreClick,
         )
     }
 }
@@ -94,6 +125,11 @@ private fun HomeScreenContent(
     onContentClick: (usersLikeContentModel: UsersLikeContentModel) -> Unit,
     onRegionClick: (regionName: String) -> Unit,
     onDomesticClick: (isDomestic: Boolean) -> Unit,
+    onRandomTravelClick: () -> Unit,
+    onPopularRegionClick: () -> Unit,
+    onPopularDestinationClick: (regionCategoryName: String) -> Unit,
+    onArticleClick: (articleId: Long) -> Unit,
+    onMagazineMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -101,14 +137,6 @@ private fun HomeScreenContent(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    if (uiState.isLoading) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            TuripLoadingIndicator()
-        }
-    }
     when {
         uiState.errorUiState != ErrorUiState.None -> {
             ErrorScreen(
@@ -152,6 +180,11 @@ private fun HomeScreenContent(
                             .padding(top = TuripTheme.spacing.extraSmall),
                 )
 
+                RandomTravelCtaButton(
+                    onClick = onRandomTravelClick,
+                    modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
+                )
+
                 Text(
                     text = stringResource(Res.string.home_users_like_content_title),
                     modifier = Modifier.padding(top = TuripTheme.spacing.medium),
@@ -161,7 +194,14 @@ private fun HomeScreenContent(
 
                 UsersLikeList(
                     usersLikeContents = uiState.usersLikeContents,
+                    isLoading = uiState.isUsersLikeLoading,
                     onContentClick = onContentClick,
+                )
+
+                PopularRegionCtaButton(
+                    destinations = uiState.popularDestinations,
+                    onDestinationClick = onPopularDestinationClick,
+                    onMoreClick = onPopularRegionClick,
                 )
 
                 RegionTypeButtons(
@@ -171,7 +211,15 @@ private fun HomeScreenContent(
 
                 RegionList(
                     regions = uiState.regionCategories,
+                    isLoading = uiState.isRegionsLoading,
                     onRegionClick = onRegionClick,
+                )
+
+                MagazineSection(
+                    articles = uiState.articles,
+                    isLoading = uiState.isArticlesLoading,
+                    onArticleClick = onArticleClick,
+                    onMoreClick = onMagazineMoreClick,
                     modifier = Modifier.padding(bottom = TuripTheme.spacing.large),
                 )
             }
@@ -186,12 +234,17 @@ private fun HomeLoadingPreview() {
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
-                uiState = uiState.copy(isLoading = true),
+                uiState = uiState,
                 onSearchClick = {},
                 onRetryLoadContents = {},
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
+                onPopularDestinationClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -203,11 +256,17 @@ private fun HomeLoadingPreview() {
 private fun HomeSuccessPreview() {
     val uiState =
         HomeUiState(
-            isLoading = false,
+            isUsersLikeLoading = false,
+            isRegionsLoading = false,
             regionCategories = emptyList(),
             isDomesticSelected = true,
             usersLikeContents = emptyList(),
             errorUiState = ErrorUiState.None,
+            popularDestinations =
+                listOf(
+                    PopularDestinationModel(rank = 1, regionCategoryName = "서울", imageUrl = null, visitorCountText = "2847만"),
+                    PopularDestinationModel(rank = 2, regionCategoryName = "부산", imageUrl = null, visitorCountText = "1204만"),
+                ),
         )
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
@@ -218,6 +277,11 @@ private fun HomeSuccessPreview() {
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
+                onPopularDestinationClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -231,12 +295,17 @@ private fun HomeServerErrorPreview() {
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
-                uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Server),
+                uiState = uiState.copy(errorUiState = ErrorUiState.Server),
                 onSearchClick = {},
                 onRetryLoadContents = {},
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
+                onPopularDestinationClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -250,12 +319,17 @@ private fun HomeNetworkErrorPreview() {
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
-                uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Network),
+                uiState = uiState.copy(errorUiState = ErrorUiState.Network),
                 onSearchClick = {},
                 onRetryLoadContents = {},
                 onContentClick = {},
                 onRegionClick = {},
                 onDomesticClick = {},
+                onRandomTravelClick = {},
+                onPopularRegionClick = {},
+                onPopularDestinationClick = {},
+                onArticleClick = {},
+                onMagazineMoreClick = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }

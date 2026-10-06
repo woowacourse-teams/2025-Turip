@@ -39,6 +39,16 @@ interface TuripRepository {
         placeId: Long,
     ): TuripResult<Unit>
 
+    /**
+     * 여러 장소를 한 번에 담는다.
+     *
+     * @return 실제로 담긴 장소의 id. 이미 담겨 있던 장소는 서버 응답에서 빠지므로 요청보다 적을 수 있다.
+     */
+    suspend fun createTuripPlaces(
+        turipId: Long,
+        placeIds: List<Long>,
+    ): TuripResult<List<Long>>
+
     suspend fun deleteTuripPlace(
         turipId: Long,
         placeId: Long,

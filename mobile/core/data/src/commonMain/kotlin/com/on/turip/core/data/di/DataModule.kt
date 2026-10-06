@@ -1,6 +1,7 @@
 package com.on.turip.core.data.di
 
 import com.on.turip.core.data.repository.DefaultAccountRepository
+import com.on.turip.core.data.repository.DefaultArticleRepository
 import com.on.turip.core.data.repository.DefaultAuthRepository
 import com.on.turip.core.data.repository.DefaultBookmarkRepository
 import com.on.turip.core.data.repository.DefaultContentRepository
@@ -16,6 +17,7 @@ import com.on.turip.core.data.userstorage.DefaultTokenManager
 import com.on.turip.core.data.userstorage.DefaultUserStorageRepository
 import com.on.turip.core.domain.fcm.FcmTokenRegistrar
 import com.on.turip.core.domain.repository.AccountRepository
+import com.on.turip.core.domain.repository.ArticleRepository
 import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.repository.BookmarkRepository
 import com.on.turip.core.domain.repository.ContentRepository
@@ -39,6 +41,7 @@ import org.koin.dsl.module
 
 val dataModule = module {
     single<AccountRepository> { DefaultAccountRepository(get()) }
+    single<ArticleRepository> { DefaultArticleRepository(get()) }
     single<AuthRepository> { DefaultAuthRepository(get(), get()) }
     single<BookmarkRepository> { DefaultBookmarkRepository(get(), get()) }
     single<ContentRepository> { DefaultContentRepository(get()) }

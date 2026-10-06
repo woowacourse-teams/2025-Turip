@@ -30,6 +30,8 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
 
     Optional<FavoritePlace> findByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place);
 
+    List<FavoritePlace> findAllByFavoriteFolderAndPlaceIn(FavoriteFolder favoriteFolder, List<Place> places);
+
     @EntityGraph(attributePaths = {"place"}, type = EntityGraph.EntityGraphType.FETCH)
     List<FavoritePlace> findAllByFavoriteFolderOrderByFavoriteOrderAsc(FavoriteFolder favoriteFolder);
 

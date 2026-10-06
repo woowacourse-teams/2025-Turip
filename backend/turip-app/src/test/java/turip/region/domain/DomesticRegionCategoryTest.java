@@ -55,7 +55,12 @@ class DomesticRegionCategoryTest {
             "전주, JEONJU",
             "강릉, GANGNEUNG",
             "속초, SOKCHO",
-            "경주, GYEONGJU"
+            "경주, GYEONGJU",
+            "공주, GONGJU",
+            "여수, YEOSU",
+            "수원, SUWON",
+            "군산, GUNSAN",
+            "대구, DAEGU"
     })
     void fromDisplayName1(String displayName, DomesticRegionCategory expected) {
         // given & when
@@ -67,7 +72,7 @@ class DomesticRegionCategoryTest {
 
     @DisplayName("존재하지 않는 지역명으로 조회 시 예외를 발생시킨다.")
     @ParameterizedTest
-    @ValueSource(strings = {"공주", "파리", "존재하지않는지역"})
+    @ValueSource(strings = {"파리", "존재하지않는지역"})
     void fromDisplayName2(String invalidName) {
         // when & then
         assertThatThrownBy(() -> DomesticRegionCategory.fromDisplayName(invalidName))

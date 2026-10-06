@@ -35,4 +35,12 @@ public record RegionCategoryResponse(
                 imageUrl
         );
     }
+
+    public static RegionCategoryResponse of(City city, String imageUrl) {
+        return new RegionCategoryResponse(
+                city.getName(),
+                CountryResponse.from(city.getCountry()),
+                imageUrl
+        );
+    }
 } 

@@ -8,6 +8,8 @@ jar {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'

@@ -18,14 +18,19 @@ import com.on.turip.core.model.region.RegionCategory
 
 private const val MAX_REGION_COUNT_IN_EACH_ROW = 4
 
+/** 로딩 중 그릴 placeholder 수. 두 줄이면 실제 목록과 높이가 비슷해 응답 후 화면이 덜 튄다. */
+private const val PLACEHOLDER_ITEM_COUNT = MAX_REGION_COUNT_IN_EACH_ROW * 2
+
 @Composable
 fun RegionList(
     regions: List<RegionCategory>,
+    isLoading: Boolean,
     onRegionClick: (regionName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val distinctRegions = regions.distinctBy { it.name }
-    val rowCount = (distinctRegions.lastIndex / MAX_REGION_COUNT_IN_EACH_ROW) + 1
+    val itemCount = if (isLoading) PLACEHOLDER_ITEM_COUNT else distinctRegions.size
+    val rowCount = ((itemCount - 1) / MAX_REGION_COUNT_IN_EACH_ROW) + 1
     val height = rowCount.times(128.dp)
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = MAX_REGION_COUNT_IN_EACH_ROW),
@@ -35,6 +40,12 @@ fun RegionList(
                 .height(height)
                 .fillMaxWidth(),
     ) {
+        if (isLoading) {
+            items(PLACEHOLDER_ITEM_COUNT) {
+                RegionPlaceholderItem()
+            }
+            return@LazyVerticalGrid
+        }
         items(distinctRegions, key = { it.name }) { regionCategory: RegionCategory ->
             RegionItem(
                 region = regionCategory,
@@ -64,6 +75,19 @@ private fun RegionListPreview() {
                     RegionCategory("여수", "", null),
                     RegionCategory("기타", "", null),
                 ),
+            isLoading = false,
+            onRegionClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegionListLoadingPreview() {
+    TuripTheme {
+        RegionList(
+            regions = emptyList(),
+            isLoading = true,
             onRegionClick = {},
         )
     }

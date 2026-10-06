@@ -18,9 +18,13 @@ class LoginUseCase(
     suspend operator fun invoke(credential: SocialCredential): TuripResult<Boolean> =
         handleLoginResult(
             when (credential) {
-                is SocialCredential.Google -> authRepository.login(credential.idToken)
-                is SocialCredential.Apple ->
+                is SocialCredential.Google -> {
+                    authRepository.login(credential.idToken)
+                }
+
+                is SocialCredential.Apple -> {
                     authRepository.loginWithApple(idToken = credential.idToken, nonce = credential.rawNonce)
+                }
             },
         )
 

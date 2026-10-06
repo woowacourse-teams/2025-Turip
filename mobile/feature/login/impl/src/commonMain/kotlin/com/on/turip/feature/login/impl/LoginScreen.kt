@@ -43,10 +43,10 @@ import com.on.turip.core.designsystem.generated.resources.my_page_logout_dialog_
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.error.toUiModel
+import com.on.turip.core.ui.util.noRippleClickable
 import com.on.turip.feature.login.impl.component.AppleLoginButton
 import com.on.turip.feature.login.impl.component.GoogleLoginButton
 import com.on.turip.feature.login.impl.component.GuestModeSection
-import com.on.turip.feature.login.impl.util.noRippleClickable
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource

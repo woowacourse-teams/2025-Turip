@@ -26,6 +26,7 @@ private fun String.toErrorType(): ErrorType =
         "CREATOR_NOT_FOUND" -> ErrorType.Creator.NotFound
         "CONTENT_NOT_FOUND" -> ErrorType.Content.NotFound
         "PLACE_NOT_FOUND" -> ErrorType.Place.NotFound
+        "ARTICLE_NOT_FOUND" -> ErrorType.Article.NotFound
         "REGION_CATEGORY_INVALID" -> ErrorType.Region.InvalidCategory
         "FAVORITE_FOLDER_NOT_FOUND" -> ErrorType.Turip.NotFound
         "FAVORITE_FOLDER_NAME_CONFLICT" -> ErrorType.Turip.DuplicatedName

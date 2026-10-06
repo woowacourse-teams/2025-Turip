@@ -56,4 +56,8 @@ public class FavoriteContent {
     public void updateAccount(Account account) {
         this.account = account;
     }
+
+    public void updateCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
 }

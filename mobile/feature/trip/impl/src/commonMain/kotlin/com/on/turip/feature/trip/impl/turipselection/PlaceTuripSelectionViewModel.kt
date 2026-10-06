@@ -14,6 +14,7 @@ import com.on.turip.core.model.turip.TuripInvitationToken
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
 import com.on.turip.core.ui.error.toUiError
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.core.ui.model.turip.TuripShareModel
 import com.on.turip.feature.trip.impl.model.MapModel
 import com.on.turip.feature.trip.impl.turipselection.model.DeletePlaceSnapshot
@@ -460,7 +461,11 @@ class PlaceTuripSelectionViewModel(
             order = order,
             name = place.name,
             category = place.category.firstOrNull().orEmpty(),
-            mapModel = MapModel.from(place.url),
+            mapModel =
+                MapModel.from(
+                    url = place.url,
+                    appleMap = AppleMap(place.name, place.latitude, place.longitude),
+                ),
             isTuripPlace = true,
             latitude = place.latitude,
             longitude = place.longitude,
