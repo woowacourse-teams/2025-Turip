@@ -18,7 +18,7 @@ public final class ExternalApiLogFormat {
     }
 
     public static String maskSensitiveParams(URI uri) {
-        String query = uri.getQuery();
+        String query = uri.getRawQuery();
         if (query == null) {
             return uri.toString();
         }

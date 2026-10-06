@@ -63,4 +63,19 @@ class ExternalApiLogFormatTest {
         // then
         assertThat(maskedUri).isEqualTo(uri.toString());
     }
+
+    @Test
+    @DisplayName("URI의 쿼리 파라미터 값에 URL 인코딩된 문자가 포함되어 있어도 마스킹한다.")
+    void maskSensitiveParamsWithEncodedValue() throws Exception {
+        // given
+        URI uri = new URI("https://www.googleapis.com/youtube/v3/videos?part=snippet&api_key=a%2Fb%3Dc&other=param");
+
+        // when
+        String maskedUri = ExternalApiLogFormat.maskSensitiveParams(uri);
+
+        // then
+        assertThat(maskedUri).contains("api_key=***");
+        assertThat(maskedUri).doesNotContain("a%2Fb%3Dc");
+        assertThat(maskedUri).contains("other=param");
+    }
 }
