@@ -38,6 +38,11 @@ youtube:
     key: test-youtube-api-key
     url: https://test.youtube.com
 
+gemini:
+  api:
+    key: test-gemini-api-key
+    base-url: https://test.gemini.com/v1beta/models
+
 korea-tourism:
   api:
     key: test-korea-tourism-api-key
