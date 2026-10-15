@@ -1,9 +1,10 @@
-package turip.infrastructure.client;
+package turip.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import turip.infrastructure.client.GeminiVideoPlaceInferenceClient;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
 
 @Slf4j
