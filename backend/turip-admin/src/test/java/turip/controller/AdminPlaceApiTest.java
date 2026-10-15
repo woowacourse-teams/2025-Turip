@@ -1,8 +1,11 @@
 package turip.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,10 +16,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Role;
 import turip.container.TestContainerConfig;
+import turip.controller.dto.response.PlaceSuggestionResponse;
+import turip.controller.dto.response.PlaceSuggestionResponse.PlaceSuggestionItem;
+import turip.service.AdminPlaceSuggestionService;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles({"test", "test-mysql"})
@@ -36,6 +43,9 @@ class AdminPlaceApiTest extends TestContainerConfig {
 
     @Autowired
     private TestDataHelper testDataHelper;
+
+    @MockitoBean
+    private AdminPlaceSuggestionService adminPlaceSuggestionService;
 
     @BeforeEach
     void setUp() {
@@ -117,6 +127,50 @@ class AdminPlaceApiTest extends TestContainerConfig {
                     .when().get("/api/v1/admin/places")
                     .then()
                     .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/places/suggestions GET 영상 장소 추천 조회 테스트")
+    class GetPlaceSuggestionsTest {
+
+        @Test
+        @DisplayName("추천 리스트를 모델명, 토큰 수와 함께 200 OK로 응답한다")
+        void getPlaceSuggestions_returnsSuggestionList() {
+            // given
+            PlaceSuggestionResponse response = new PlaceSuggestionResponse(
+                    "gemini-3.8-flash", 1234,
+                    List.of(new PlaceSuggestionItem("해운대", 95, 330, "자막 확인"))
+            );
+            when(adminPlaceSuggestionService.getSuggestions(anyString())).thenReturn(response);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("url", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                    .when().get("/api/v1/admin/places/suggestions")
+                    .then()
+                    .statusCode(200)
+                    .body("modelName", is("gemini-3.8-flash"))
+                    .body("totalTokenCount", is(1234))
+                    .body("suggestions[0].placeName", is("해운대"))
+                    .body("suggestions[0].confidence", is(95))
+                    .body("suggestions[0].timeSeconds", is(330));
+        }
+
+        @Test
+        @DisplayName("Gemini가 전부 실패해도 200과 빈 추천 리스트를 응답한다")
+        void getPlaceSuggestions_whenAllModelsFail_returnsEmptyList() {
+            // given
+            PlaceSuggestionResponse response = new PlaceSuggestionResponse("gemini-3.5-flash-lite", null, List.of());
+            when(adminPlaceSuggestionService.getSuggestions(anyString())).thenReturn(response);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("url", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                    .when().get("/api/v1/admin/places/suggestions")
+                    .then()
+                    .statusCode(200)
+                    .body("suggestions.size()", is(0));
         }
     }
 }

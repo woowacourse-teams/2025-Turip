@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import turip.infrastructure.client.dto.GeminiGenerateContentResponse;
@@ -66,6 +67,7 @@ public class GeminiVideoPlaceInferenceClient {
                             .path("/" + modelName + ":generateContent")
                             .queryParam("key", geminiApiKey)
                             .build())
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
                     .onStatus(status -> status.value() == 429, (request, res) -> {
