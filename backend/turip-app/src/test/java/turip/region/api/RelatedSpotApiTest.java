@@ -17,7 +17,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import reactor.core.publisher.Mono;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.infrastructure.client.dto.RelatedSpotResult;
@@ -58,11 +57,11 @@ class RelatedSpotApiTest {
 
             // 서울의 3개 시군구 코드에 대해 모킹
             given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                    .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot1))));
+                    .willReturn(RelatedSpotResult.success(List.of(spot1)));
             given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                    .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot2))));
+                    .willReturn(RelatedSpotResult.success(List.of(spot2)));
             given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                    .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot3))));
+                    .willReturn(RelatedSpotResult.success(List.of(spot3)));
 
             // when & then
             RestAssured.given().port(port)
@@ -82,7 +81,7 @@ class RelatedSpotApiTest {
         void readRelatedSpots2() {
             // given
             given(koreaTourismRelatedSpotClient.searchRelatedSpots(anyInt(), anyInt()))
-                    .willReturn(Mono.just(RelatedSpotResult.failure()));
+                    .willReturn(RelatedSpotResult.failure());
 
             // when & then
             RestAssured.given().port(port)

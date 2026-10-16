@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.infrastructure.client.dto.RelatedSpotResult;
 
@@ -32,7 +31,6 @@ class KoreaTourismRelatedSpotClientTest {
         String baseUrl = mockWebServer.url("/").toString();
         koreaTourismRelatedSpotClient = new KoreaTourismRelatedSpotClient(
                 RestClient.builder().build(),
-                WebClient.builder().build(),
                 API_KEY,
                 baseUrl
         );
@@ -91,7 +89,7 @@ class KoreaTourismRelatedSpotClientTest {
                 .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
 
         // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
@@ -144,7 +142,7 @@ class KoreaTourismRelatedSpotClientTest {
                 .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
 
         // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
@@ -160,7 +158,7 @@ class KoreaTourismRelatedSpotClientTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
         // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
@@ -178,7 +176,7 @@ class KoreaTourismRelatedSpotClientTest {
                 .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
 
         // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(

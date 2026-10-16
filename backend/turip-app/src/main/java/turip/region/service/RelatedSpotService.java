@@ -1,10 +1,11 @@
 package turip.region.service;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
@@ -25,15 +26,15 @@ public class RelatedSpotService {
         this.koreaTourismRelatedSpotClient = koreaTourismRelatedSpotClient;
     }
 
-    public Mono<RelatedSpotsResponse> findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
+    public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
         TourApiAreaCode areaCode = parseToAreaCode(category);
         if (!areaCode.isFound()) {
             log.warn("지역 카테고리에 매핑되는 TourAPI 지역 코드를 찾을 수 없습니다: {}", category);
-            return Mono.just(RelatedSpotsResponse.empty());
+            return RelatedSpotsResponse.empty();
         }
 
-        return getRelatedSpotsByAreaCode(areaCode)
-                .map(results -> toRelatedSpotsResponse(category, results));
+        List<RelatedSpotResult> results = getRelatedSpotsByAreaCode(areaCode);
+        return toRelatedSpotsResponse(category, results);
     }
 
     private TourApiAreaCode parseToAreaCode(DomesticRegionCategory category) {
@@ -43,18 +44,31 @@ public class RelatedSpotService {
         return TourApiAreaCode.fromDomesticRegionCategory(category);
     }
 
-    private Mono<List<RelatedSpotResult>> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
-        // 여러 시군구 코드에 대해 WebClient로 비동기 논블로킹 병렬 호출
-        List<Mono<RelatedSpotResult>> monos = areaCode.getSigunguCodes().stream()
-                .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
-                        areaCode.getAreaCode(),
-                        sigunguCode
-                ))
-                .toList();
+    private List<RelatedSpotResult> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
+        // 가상 스레드 비교 실험: 전용 스레드풀(ThreadPoolTaskExecutor) 없이,
+        // 시군구 코드별로 가상 스레드를 하나씩 띄워 병렬 블로킹 호출 (풀링이 필요 없는 가상 스레드 특성 활용)
+        try (ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<RelatedSpotResult>> futures = areaCode.getSigunguCodes().stream()
+                    .map(sigunguCode -> CompletableFuture.supplyAsync(
+                            () -> koreaTourismRelatedSpotClient.searchRelatedSpots(
+                                    areaCode.getAreaCode(),
+                                    sigunguCode
+                            ),
+                            virtualThreadExecutor
+                    ))
+                    .toList();
 
-        return Mono.zip(monos, results -> Arrays.stream(results)
-                .map(result -> (RelatedSpotResult) result)
-                .toList());
+            return futures.stream()
+                    .map(future -> {
+                        try {
+                            return future.join();
+                        } catch (Exception e) {
+                            log.warn("연관 관광지 API 호출 중 예외 발생: {}", e.getMessage());
+                            return RelatedSpotResult.failure();
+                        }
+                    })
+                    .toList();
+        }
     }
 
     private RelatedSpotsResponse toRelatedSpotsResponse(DomesticRegionCategory category,
