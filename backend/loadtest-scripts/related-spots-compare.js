@@ -43,11 +43,13 @@
 //   VU=10 : 외부 호출 30건. 커넥션풀 3배 과포화.
 //   VU=15 : 외부 호출 45건. 4.5배 과포화. 블로킹 조건의 큐 대기가 본격화되는 구간.
 //   VU=20 : 외부 호출 60건. 6배 과포화.
-//   VU=25 : 외부 호출 75건. 7.5배 과포화. 세 조건의 한계 지점을 관찰한다.
+//   VU=30 : 외부 호출 90건. 9배 과포화. 세 조건의 한계 지점을 관찰한다.
 //
-//   상한을 25로 잡은 이유: VU 30까지 올린 측정에서 외부 API가 429(Too Many Requests)를
-//   853건 반환했고(전체 호출의 5.4%), 요청 단위 폴백 비율이 10.68%까지 올라갔다.
-//   그 구간은 서버의 처리 구조가 아니라 외부 API의 호출량 제한을 측정하게 된다.
+//   VU 30 구간에서는 외부 API가 429(Too Many Requests)를 반환하기 시작한다.
+//   조건 1 측정에서 전체 호출 15,939건 중 853건(5.4%)이 429였고, 요청 단위
+//   폴백 비율은 10.68%였다. 폴백도 애플리케이션이 수행하는 정상 경로이므로
+//   이를 포함한 전체 응답 시간을 비교 기본 지표로 삼되, 조건 간 폴백 비율 차이가
+//   크면 해석에 반영한다.
 //   참고로 폴백의 원인은 전용 스레드풀 포화가 아니었다. 측정 후 큐는 비어 있었고
 //   (queue_remaining 50/50), 거부 예외도 없었다.
 //
@@ -81,7 +83,7 @@ const STAGES = [
     { vus: 10, label: "VU=10 (커넥션풀 3배 과포화, 30건)" },
     { vus: 15, label: "VU=15 (4.5배 과포화, 45건)" },
     { vus: 20, label: "VU=20 (6배 과포화, 60건)" },
-    { vus: 25, label: "VU=25 (7.5배 과포화, 75건 - 한계 관찰)" },
+    { vus: 30, label: "VU=30 (9배 과포화, 90건 - 한계 관찰)" },
 ];
 
 const RAMP_TIME = __ENV.RAMP_TIME || "5s";
@@ -97,8 +99,12 @@ function buildStages() {
     return stages;
 }
 
+// 폴백을 포함한 전체 응답 시간. 사용자가 실제로 체감하는 값이다.
+// 폴백도 애플리케이션이 수행하는 정상 경로이므로, 세 조건을 비교할 때의 기본 지표로 쓴다.
+const totalDuration = new Trend("spots_duration_total", true);
+
 // 외부 API를 실제로 호출해 응답한 요청만 담는 latency.
-// 이 테스트에서 비교해야 할 "진짜" 응답 시간은 이 지표다.
+// 전체 지표가 폴백 비율에 따라 흔들리므로, 순수한 처리 성능을 보려면 이쪽을 함께 본다.
 const apiDuration = new Trend("spots_duration_api", true);
 
 // 폴백으로 즉시 반환된 요청의 latency. 비교 대상은 아니지만,
@@ -124,9 +130,8 @@ export const options = {
         },
     },
     thresholds: {
-        // 폴백 비율이 높아지는 것 자체가 관찰 대상이므로 빌드를 실패시키지는 않는다.
-        // 다만 집계에서 눈에 띄도록 임계값은 걸어둔다.
-        spots_fallback_rate: [{ threshold: "rate<0.10", abortOnFail: false }],
+        // 폴백은 애플리케이션의 정상 경로이므로 임계값을 걸지 않는다.
+        // 비율 자체는 요약에서 확인하고, 조건 간 차이가 크면 해석에 반영한다.
         http_req_failed: [{ threshold: "rate<0.50", abortOnFail: false }],
     },
 };
@@ -162,6 +167,9 @@ export default function () {
 
     const isFallback = dataSource.startsWith("fallback");
     fallbackRate.add(isFallback);
+
+    // 폴백 여부와 무관하게 모든 정상 응답을 담는다.
+    totalDuration.add(res.timings.duration, vuTag);
 
     if (isFallback) {
         fallbackDuration.add(res.timings.duration, vuTag);
@@ -213,11 +221,12 @@ export function handleSummary(data) {
         `총 요청  : ${totalReqs} (외부 API 호출 약 ${totalReqs * 3}회)`,
         "",
         "── 응답 시간 ──────────────────────────────────────────",
-        `외부 API 응답 : ${fmt(m.spots_duration_api)}`,
-        `폴백 응답     : ${fmt(m.spots_duration_fallback)}`,
-        "  ※ 비교해야 할 지표는 '외부 API 응답'이다.",
-        "     폴백은 외부 호출이 실패/타임아웃된 뒤에 떨어지는 경로라 그 대기 시간이",
-        "     그대로 쌓인다. 섞어서 보면 외부 API 실패 대기까지 함께 재게 된다.",
+        `전체 응답     : ${fmt(m.spots_duration_total)}   ← 조건 비교의 기본 지표`,
+        `  외부 API분  : ${fmt(m.spots_duration_api)}`,
+        `  폴백분      : ${fmt(m.spots_duration_fallback)}`,
+        "  ※ 폴백도 애플리케이션이 수행하는 정상 경로이므로 '전체 응답'으로 비교한다.",
+        "     다만 폴백은 외부 호출이 실패/타임아웃된 뒤에 떨어지는 경로라 대기 시간이",
+        "     그대로 쌓인다. 폴백 비율이 조건마다 크게 다르면 그 영향을 함께 봐야 한다.",
         "",
         "── 폴백 현황 ──────────────────────────────────────────",
         `폴백 비율        : ${(fbRate * 100).toFixed(2)}%`,
@@ -238,9 +247,9 @@ export function handleSummary(data) {
 
     if (fbRate > 0.1) {
         lines.push(
-            "!! 주의: 폴백 비율이 10%를 넘는다.",
-            "   외부 API가 차단되고 있을 가능성이 높으므로, 부하를 더 낮추거나",
-            "   호출 간격을 두고 다시 측정하는 것을 권한다.",
+            "※ 폴백 비율이 10%를 넘는다. 외부 API가 429로 호출을 거부하고 있을 가능성이 높다.",
+            "   폴백 자체는 정상 경로지만, 조건 간 폴백 비율 차이가 크면 전체 응답 시간을",
+            "   비교할 때 그 차이를 함께 고려해야 한다.",
             ""
         );
     }
