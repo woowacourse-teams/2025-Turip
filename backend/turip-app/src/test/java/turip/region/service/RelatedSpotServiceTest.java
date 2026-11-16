@@ -19,6 +19,8 @@ import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSp
 import turip.infrastructure.client.dto.RelatedSpotResult;
 import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.DomesticRegionCategory;
+import turip.region.service.dto.RelatedSpotsDataSource;
+import turip.region.service.dto.RelatedSpotsResult;
 
 @ExtendWith(MockitoExtension.class)
 class RelatedSpotServiceTest {
@@ -55,10 +57,12 @@ class RelatedSpotServiceTest {
                 .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot3))));
 
         // when
-        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
 
         // then
+        RelatedSpotsResponse response = result.response();
         assertAll(
+                () -> assertThat(result.dataSource()).isEqualTo(RelatedSpotsDataSource.API),
                 () -> assertThat(response.relatedSpots()).hasSize(1),
                 () -> assertThat(response.relatedSpots().getFirst().category()).isEqualTo("관광지"),
                 () -> assertThat(response.relatedSpots().getFirst().spots())
@@ -77,7 +81,7 @@ class RelatedSpotServiceTest {
                 .isInstanceOf(turip.common.exception.custom.IllegalArgumentException.class);
     }
 
-    @DisplayName("외부 API 호출이 실패하면 fallback 데이터를 사용한다")
+    @DisplayName("외부 API 호출이 모두 실패하면 fallback 데이터를 사용하고 출처를 FALLBACK_FAILED로 표시한다")
     @Test
     void findRelatedSpotsByRegionCategory3() {
         // given
@@ -92,13 +96,16 @@ class RelatedSpotServiceTest {
                 .willReturn(Mono.just(RelatedSpotResult.failure()));
 
         // when
-        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
 
         // then
-        assertThat(response.relatedSpots()).isNotEmpty();
+        assertAll(
+                () -> assertThat(result.dataSource()).isEqualTo(RelatedSpotsDataSource.FALLBACK_FAILED),
+                () -> assertThat(result.response().relatedSpots()).isNotEmpty()
+        );
     }
 
-    @DisplayName("외부 API 성공했지만 데이터가 비어있으면 fallback 데이터를 사용한다")
+    @DisplayName("외부 API 성공했지만 데이터가 비어있으면 fallback 데이터를 사용하고 출처를 FALLBACK_EMPTY로 표시한다")
     @Test
     void findRelatedSpotsByRegionCategory4() {
         // given
@@ -113,9 +120,12 @@ class RelatedSpotServiceTest {
                 .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
 
         // when
-        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
 
         // then
-        assertThat(response.relatedSpots()).isNotEmpty();
+        assertAll(
+                () -> assertThat(result.dataSource()).isEqualTo(RelatedSpotsDataSource.FALLBACK_EMPTY),
+                () -> assertThat(result.response().relatedSpots()).isNotEmpty()
+        );
     }
 }

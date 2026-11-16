@@ -70,6 +70,7 @@ class RelatedSpotApiTest {
                     .when().get("/api/v1/related-spots")
                     .then()
                     .statusCode(200)
+                    .header("X-Data-Source", is("api"))
                     .body("relatedSpots.size()", is(2)) // 관광지, 음식점
                     .body("relatedSpots[0].category", is("관광지"))
                     .body("relatedSpots[0].spots.size()", is(2))
@@ -90,6 +91,24 @@ class RelatedSpotApiTest {
                     .when().get("/api/v1/related-spots")
                     .then()
                     .statusCode(200)
+                    .header("X-Data-Source", is("fallback-failed"))
+                    .body("relatedSpots.size()", greaterThan(0));
+        }
+
+        @DisplayName("외부 API는 성공했지만 데이터가 비어있으면 폴백 응답에 fallback-empty 출처를 표시한다")
+        @Test
+        void readRelatedSpots5() {
+            // given
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(anyInt(), anyInt()))
+                    .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("regionCategory", "부산")
+                    .when().get("/api/v1/related-spots")
+                    .then()
+                    .statusCode(200)
+                    .header("X-Data-Source", is("fallback-empty"))
                     .body("relatedSpots.size()", greaterThan(0));
         }
 

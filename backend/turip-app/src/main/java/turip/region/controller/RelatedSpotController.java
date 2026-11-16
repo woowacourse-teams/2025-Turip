@@ -25,6 +25,12 @@ import turip.region.service.RelatedSpotService;
 @Tag(name = "RelatedSpot", description = "연관 관광지 API")
 public class RelatedSpotController {
 
+    /**
+     * 응답 본문이 외부 API 데이터인지 폴백 데이터인지 나타내는 헤더.
+     * 폴백 응답도 동일한 본문 스키마로 200을 반환하므로, 부하테스트에서 이 헤더로 둘을 구분한다.
+     */
+    private static final String DATA_SOURCE_HEADER = "X-Data-Source";
+
     private final RelatedSpotService relatedSpotService;
 
     @Operation(
@@ -69,6 +75,8 @@ public class RelatedSpotController {
             @RequestParam(name = "regionCategory") DomesticRegionCategory regionCategory
     ) {
         return relatedSpotService.findRelatedSpotsByRegionCategory(regionCategory)
-                .map(ResponseEntity::ok);
+                .map(result -> ResponseEntity.ok()
+                        .header(DATA_SOURCE_HEADER, result.dataSource().getValue())
+                        .body(result.response()));
     }
 }
