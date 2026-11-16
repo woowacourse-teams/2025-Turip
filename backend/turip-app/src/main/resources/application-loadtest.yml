@@ -29,12 +29,6 @@ spring:
     validate-on-migrate: true
     encoding: UTF-8
 
-server:
-  tomcat:
-    threads:
-      max: ${TOMCAT_MAX_THREADS:200}
-      min-spare: ${TOMCAT_MIN_THREADS:10}
-
 jwt:
   access-token-expiration-ms: 86400000  # 1일
 
