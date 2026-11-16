@@ -2,10 +2,6 @@ spring:
   profiles:
     active: local
 
-  threads:
-    virtual:
-      enabled: true
-
   jpa:
     show-sql: true
     properties:
