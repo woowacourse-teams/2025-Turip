@@ -19,6 +19,9 @@ env:
   IMAGE_NAME_PREFIX: loadtest
   NGINX_PORT: 80
   SPRING_PROFILES_ACTIVE: loadtest
+  APP_JAVA_XMS: 256m
+  APP_JAVA_XMX: 384m
+  SERVER_TOMCAT_THREADS_MAX: 10
 
 jobs:
   build:
@@ -99,8 +102,12 @@ jobs:
           DOMESTIC_ETC_IMAGE_URL=${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
           OVERSEAS_ETC_IMAGE_URL=${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
           CSV_IMPORT_PASSWORD=${{ secrets.CSV_IMPORT_PASSWORD }}
-          INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
           KOREA_TOURISM_API_KEY=${{ secrets.KOREA_TOURISM_API_KEY }}
+          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+          ARTICLE_DEFAULT_THUMBNAIL_URL=${{ secrets.ARTICLE_DEFAULT_THUMBNAIL_URL }}
+          APP_JAVA_XMS=${{ env.APP_JAVA_XMS }}
+          APP_JAVA_XMX=${{ env.APP_JAVA_XMX }}
+          SERVER_TOMCAT_THREADS_MAX=${{ env.SERVER_TOMCAT_THREADS_MAX }}
           ENVEOF
 
       - name: Login to Docker Hub
