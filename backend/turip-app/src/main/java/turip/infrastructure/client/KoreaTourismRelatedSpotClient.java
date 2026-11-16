@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse;
 import turip.infrastructure.client.dto.RelatedSpotResult;
 
@@ -27,24 +25,26 @@ public class KoreaTourismRelatedSpotClient {
     private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 
     private final RestClient restClient;
-    private final WebClient webClient;
     private final String koreaTourismApiKey;
     private final String koreaTourismApiUrl;
 
     private volatile String currentBaseYm = DEFAULT_BASE_YM; // 동적으로 관리되는 기준월
 
-    // 가상 스레드 비교 실험: WebClient를 제거하고 RestClient 동기 블로킹 호출로 전환 (스레드는 가상 스레드가 담당)
     public KoreaTourismRelatedSpotClient(RestClient baseRestClient,
-                                         WebClient baseWebClient,
                                          @Value("${korea-tourism.api.key}") String koreaTourismApiKey,
                                          @Value("${korea-tourism.api.related-spot-url}") String koreaTourismApiUrl) {
         this.restClient = baseRestClient;
-        this.webClient = baseWebClient;
         this.koreaTourismApiKey = koreaTourismApiKey;
         this.koreaTourismApiUrl = koreaTourismApiUrl;
     }
 
-    public Mono<RelatedSpotResult> searchRelatedSpots(int areaCode, int sigunguCode) {
+    /**
+     * 연관 관광지를 조회한다 (부하테스트 조건 1: RestClient 동기 블로킹 호출).
+     * <p>
+     * 호출하는 스레드가 외부 API 응답이 올 때까지 블로킹된다. 병렬 호출은 호출부에서
+     * 전용 스레드풀로 처리하며, 그 풀의 크기가 동시 외부 호출 수의 상한이 된다.
+     */
+    public RelatedSpotResult searchRelatedSpots(int areaCode, int sigunguCode) {
         // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
         StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
                 .append("?serviceKey=").append(koreaTourismApiKey)
@@ -59,28 +59,31 @@ public class KoreaTourismRelatedSpotClient {
 
         URI uri = URI.create(uriString.toString());
 
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(KoreaTourismRelatedSpotResponse.class)
-                .switchIfEmpty(Mono.fromRunnable(() ->
-                        log.warn("한국관광공사 연관 관광지 API 응답 본문이 비어있음: areaCode={}, sigunguCode={}",
-                                areaCode, sigunguCode)))
-                .map(response -> {
-                    if (!response.isSuccess()) {
-                        log.warn("한국관광공사 연관 관광지 API 응답 실패: resultCode={}, resultMsg={}",
-                                response.getResultCode(), response.getResultMsg());
-                        return RelatedSpotResult.failure();
-                    }
-                    // API 호출 성공, 데이터가 비어있어도 success로 반환
-                    return RelatedSpotResult.success(response.getRelatedSpots());
-                })
-                .defaultIfEmpty(RelatedSpotResult.failure())
-                .onErrorResume(e -> {
-                    log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
-                            areaCode, sigunguCode, e.getMessage());
-                    return Mono.just(RelatedSpotResult.failure());
-                });
+        try {
+            KoreaTourismRelatedSpotResponse response = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(KoreaTourismRelatedSpotResponse.class);
+
+            if (response == null) {
+                log.warn("한국관광공사 연관 관광지 API 응답 본문이 비어있음: areaCode={}, sigunguCode={}",
+                        areaCode, sigunguCode);
+                return RelatedSpotResult.failure();
+            }
+
+            if (!response.isSuccess()) {
+                log.warn("한국관광공사 연관 관광지 API 응답 실패: resultCode={}, resultMsg={}",
+                        response.getResultCode(), response.getResultMsg());
+                return RelatedSpotResult.failure();
+            }
+
+            // API 호출 성공, 데이터가 비어있어도 success로 반환
+            return RelatedSpotResult.success(response.getRelatedSpots());
+        } catch (Exception e) {
+            log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
+                    areaCode, sigunguCode, e.getMessage());
+            return RelatedSpotResult.failure();
+        }
     }
 
     /**
