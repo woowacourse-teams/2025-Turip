@@ -7,10 +7,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
@@ -24,11 +25,19 @@ import turip.region.service.dto.RelatedSpotsResult;
 @ExtendWith(MockitoExtension.class)
 class RelatedSpotServiceTest {
 
-    @InjectMocks
-    private RelatedSpotService relatedSpotService;
-
     @Mock
     private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
+
+    private RelatedSpotService relatedSpotService;
+
+    @BeforeEach
+    void setUp() {
+        // 호출한 스레드에서 그대로 실행하는 Executor.
+        // 병렬 실행 여부는 이 테스트의 검증 대상이 아니고, 결과 조합과 폴백 판정만 확인하면 되므로
+        // 스레드풀을 띄우지 않고 결정적으로 동작하게 한다.
+        Executor directExecutor = Runnable::run;
+        relatedSpotService = new RelatedSpotService(koreaTourismRelatedSpotClient, directExecutor);
+    }
 
     @DisplayName("지역 카테고리로 연관 관광지를 조회한다")
     @Test

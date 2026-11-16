@@ -2,9 +2,9 @@ package turip.region.service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
@@ -23,9 +23,13 @@ import turip.region.service.dto.RelatedSpotsResult;
 public class RelatedSpotService {
 
     private final KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
+    private final Executor koreaTourismApiExecutor;
 
-    public RelatedSpotService(KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient) {
+    public RelatedSpotService(
+            KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient,
+            @Qualifier("koreaTourismApiExecutor") Executor koreaTourismApiExecutor) {
         this.koreaTourismRelatedSpotClient = koreaTourismRelatedSpotClient;
+        this.koreaTourismApiExecutor = koreaTourismApiExecutor;
     }
 
     public RelatedSpotsResult findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
@@ -50,44 +54,34 @@ public class RelatedSpotService {
     }
 
     /**
-     * 시군구 코드별로 외부 API를 병렬 호출한다 (부하테스트 조건 3: 가상 스레드).
+     * 시군구 코드별로 외부 API를 병렬 호출한다 (부하테스트 조건 1: 전용 스레드풀 10).
      * <p>
-     * 조건 1과 비교했을 때 바뀐 것은 "병렬 실행 수단" 하나뿐이다. 외부 호출이 블로킹이라는 점도,
-     * 호출부인 톰캣 스레드가 결과를 기다린다는 점도 같다. 따라서 두 조건의 차이는 고정 크기
-     * 스레드풀과 가상 스레드의 차이로만 설명된다.
-     * <p>
-     * 가상 스레드는 생성 비용이 낮아 풀링하지 않고 호출마다 새로 띄운다. 블로킹되면 캐리어
-     * 스레드를 반납하고 언마운트되므로, 조건 1처럼 풀 크기가 동시 호출 수의 상한이 되지 않는다.
-     * <p>
-     * spring.threads.virtual.enabled는 켜지 않는다. 그 플래그는 톰캣 워커까지 가상 스레드로
-     * 바꾸기 때문에, 켜면 바뀌는 변수가 둘이 되어 가상 스레드 자체의 효과를 분리할 수 없다.
-     * 여기서 쓰는 Executors.newVirtualThreadPerTaskExecutor()는 JDK API라 그 플래그와 무관하게
-     * 동작한다.
+     * 각 호출은 블로킹이므로 응답이 올 때까지 풀의 스레드 하나를 점유한다. 풀 크기가 10이고
+     * 요청 1건이 3개 코드를 호출하므로, 동시 요청이 약 4건을 넘어서면 풀이 포화되어
+     * 큐에서 대기하게 된다. 호출부인 톰캣 스레드도 결과를 기다리며 함께 블로킹된다.
      */
     private List<RelatedSpotResult> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
-        // close()가 제출된 작업의 완료를 기다리므로 try-with-resources가 곧 완료 대기 지점이 된다.
-        try (ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
-            List<CompletableFuture<RelatedSpotResult>> futures = areaCode.getSigunguCodes().stream()
-                    .map(sigunguCode -> CompletableFuture.supplyAsync(
-                            () -> koreaTourismRelatedSpotClient.searchRelatedSpots(
-                                    areaCode.getAreaCode(),
-                                    sigunguCode
-                            ),
-                            virtualThreadExecutor
-                    ))
-                    .toList();
+        List<CompletableFuture<RelatedSpotResult>> futures = areaCode.getSigunguCodes().stream()
+                .map(sigunguCode -> CompletableFuture.supplyAsync(
+                        () -> koreaTourismRelatedSpotClient.searchRelatedSpots(
+                                areaCode.getAreaCode(),
+                                sigunguCode
+                        ),
+                        koreaTourismApiExecutor
+                ))
+                .toList();
 
-            return futures.stream()
-                    .map(future -> {
-                        try {
-                            return future.join();
-                        } catch (Exception e) {
-                            log.warn("연관 관광지 API 호출 중 예외 발생: {}", e.getMessage());
-                            return RelatedSpotResult.failure();
-                        }
-                    })
-                    .toList();
-        }
+        // 모든 비동기 작업 완료 대기 (스레드풀 거부 등 예외 발생 시 실패로 처리)
+        return futures.stream()
+                .map(future -> {
+                    try {
+                        return future.join();
+                    } catch (Exception e) {
+                        log.warn("연관 관광지 API 호출 중 예외 발생: {}", e.getMessage());
+                        return RelatedSpotResult.failure();
+                    }
+                })
+                .toList();
     }
 
     private RelatedSpotsResult toRelatedSpotsResult(DomesticRegionCategory category,

@@ -39,10 +39,10 @@ public class KoreaTourismRelatedSpotClient {
     }
 
     /**
-     * 연관 관광지를 조회한다 (RestClient 동기 블로킹 호출).
+     * 연관 관광지를 조회한다 (부하테스트 조건 1: RestClient 동기 블로킹 호출).
      * <p>
-     * 호출하는 스레드가 외부 API 응답이 올 때까지 블로킹된다. 병렬 호출 방식은 호출부가 정하며,
-     * 조건 1은 전용 스레드풀을, 조건 3은 가상 스레드를 쓴다.
+     * 호출하는 스레드가 외부 API 응답이 올 때까지 블로킹된다. 병렬 호출은 호출부에서
+     * 전용 스레드풀로 처리하며, 그 풀의 크기가 동시 외부 호출 수의 상한이 된다.
      */
     public RelatedSpotResult searchRelatedSpots(int areaCode, int sigunguCode) {
         // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
