@@ -1,0 +1,36 @@
+package com.on.turip.feature.article.impl.platform
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import com.on.turip.core.model.trip.MapType
+import io.github.aakira.napier.Napier
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
+
+@Composable
+internal actual fun rememberArticleDetailPlatformActions(): ArticleDetailPlatformActions =
+    remember {
+        ArticleDetailPlatformActions(
+            openUrl = { url: String -> openUrl(url) },
+        )
+    }
+
+private fun openUrl(url: String) {
+    if (!MapType.isAllowedMapUrl(url)) {
+        Napier.e("iOS blocked non-map external URL. url=$url")
+        return
+    }
+    val nsUrl = NSURL.URLWithString(url) ?: run {
+        Napier.e("iOS failed to create NSURL. url=$url")
+        return
+    }
+    UIApplication.sharedApplication.openURL(
+        url = nsUrl,
+        options = emptyMap<Any?, Any?>(),
+        completionHandler = { success ->
+            if (!success) {
+                Napier.e("iOS failed to open external URL. url=$url")
+            }
+        },
+    )
+}

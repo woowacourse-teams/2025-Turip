@@ -2,7 +2,10 @@ package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.data.datasource.RegionRemoteDataSource
+import com.on.turip.core.data.dto.region.PopularDestinationResponse
 import com.on.turip.core.data.dto.region.RegionCategoriesResponse
+import com.on.turip.core.data.dto.region.RegionPopularityResponse
+import com.on.turip.core.data.dto.region.RelatedSpotsResponse
 import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.RegionService
 import kotlinx.coroutines.Dispatchers
@@ -17,5 +20,20 @@ class DefaultRegionRemoteDataSource(
     override suspend fun getRegionCategories(isDomestic: Boolean): TuripResult<RegionCategoriesResponse> =
         withContext(coroutineContext) {
             safeApiCall { regionService.getRegionCategories(isDomestic) }
+        }
+
+    override suspend fun getRelatedSpots(regionCategoryName: String): TuripResult<RelatedSpotsResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { regionService.getRelatedSpots(regionCategoryName) }
+        }
+
+    override suspend fun getRegionPopularity(): TuripResult<RegionPopularityResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { regionService.getRegionPopularity() }
+        }
+
+    override suspend fun getPopularDestinations(): TuripResult<PopularDestinationResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { regionService.getPopularDestinations() }
         }
 }

@@ -20,6 +20,11 @@ public enum DomesticRegionCategory {
     GANGNEUNG("강릉"),
     SOKCHO("속초"),
     GYEONGJU("경주"),
+    GONGJU("공주"),
+    YEOSU("여수"),
+    SUWON("수원"),
+    GUNSAN("군산"),
+    DAEGU("대구"),
     OTHER_DOMESTIC("국내 기타");
 
     private final String displayName;

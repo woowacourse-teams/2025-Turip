@@ -48,10 +48,12 @@ import com.on.turip.core.designsystem.generated.resources.trip_detail_turip_sele
 import com.on.turip.core.designsystem.generated.resources.turip_added_snackbar_message
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.model.turip.TuripNameStatus
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.toUiModel
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.core.ui.model.turip.TuripShareModel
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.trip.impl.component.ContentBookmarkButton
@@ -311,7 +313,8 @@ fun TripDetailScreen(
             val focusRequester = remember { FocusRequester() }
             NameEditorSheetContent(
                 title = stringResource(Res.string.bottom_sheet_turip_add_title),
-                turipName = uiState.addTuripInputName,
+                initialTuripName = uiState.addTuripInputName,
+                maxLength = TuripNameStatus.MAX_LENGTH,
                 turipNameStatus = uiState.addTuripNameStatus,
                 isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
                 onNameChanged = viewModel::updateAddTuripInputName,
@@ -418,6 +421,7 @@ private val samplePlaces =
             category = "역",
             mapLink = "kakao.com/123",
             timeLine = "01:03",
+            appleMap = AppleMap.Idle,
         ),
         PlaceModel(
             id = 2L,
@@ -426,6 +430,7 @@ private val samplePlaces =
             category = "명소",
             mapLink = "google.com/maps",
             timeLine = "03:12",
+            appleMap = AppleMap.Idle,
         ),
     )
 

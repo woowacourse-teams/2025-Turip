@@ -22,6 +22,15 @@ public enum ErrorTag {
     INVITATION_TOKEN_EXPIRED("초대 토큰이 만료됐습니다."),
     INVALID_INVITATION_TOKEN("유효하지 않은 초대 토큰입니다."),
 
+    ARTICLE_TITLE_BLANK("아티클 제목은 비워둘 수 없습니다."),
+    ARTICLE_TITLE_TOO_LONG("아티클 제목의 최대 길이를 초과했습니다."),
+    ARTICLE_SUBTITLE_BLANK("아티클 부제목은 비워둘 수 없습니다."),
+    ARTICLE_SUBTITLE_TOO_LONG("아티클 부제목의 최대 길이를 초과했습니다."),
+    ARTICLE_CONTENT_BLANK("아티클 본문은 비워둘 수 없습니다."),
+    ARTICLE_CONTENT_TOO_LONG("아티클 본문의 최대 길이를 초과했습니다."),
+    TAG_NAME_BLANK("태그 이름은 비워둘 수 없습니다."),
+    TAG_NAME_TOO_LONG("태그 이름의 최대 길이를 초과했습니다."),
+
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
     ID_TOKEN_NOT_VALID("유효하지 않은 id token입니다."),
@@ -42,6 +51,7 @@ public enum ErrorTag {
     GUEST_NOT_FOUND("게스트를 찾을 수 없습니다."),
     ACCOUNT_NOT_FOUND("계정을 찾을 수 없습니다."),
     CONTENT_NOT_FOUND("컨텐츠를 찾을 수 없습니다."),
+    ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다."),
     FAVORITE_FOLDER_NOT_FOUND("찜폴더를 찾을 수 없습니다."),
     DEFAULT_FOLDER_NOT_FOUND("기본 찜폴더를 찾을 수 없습니다."),
     PLACE_NOT_FOUND("장소를 찾을 수 없습니다."),
@@ -50,7 +60,6 @@ public enum ErrorTag {
     FAVORITE_CONTENT_NOT_FOUND("찜한 컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_ACCOUNT_NOT_FOUND("찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."),
     FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다."),
-
 
     // 409 Conflict
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),
@@ -76,6 +85,10 @@ public enum ErrorTag {
     CONTENT_PENDING_NOT_FOUND("펜딩 콘텐츠를 찾을 수 없습니다."),
     REJECT_REASON_REQUIRED("거절 사유를 입력해주세요."),
     VALIDATOR_NOT_VALID("해당 콘텐츠를 검증할 권한이 없습니다."),
+    ARTICLE_IMAGE_INVALID_TYPE("이미지 파일만 업로드할 수 있습니다. (jpg, jpeg, png, webp, gif만 허용)"),
+    ARTICLE_IMAGE_TOO_LARGE("이미지 파일의 최대 크기(10MB)를 초과했습니다."),
+    ARTICLE_ORDER_INVALID("요청한 아티클 순서 정보가 현재 목록과 일치하지 않습니다."),
+    NOT_ADMIN_ACCOUNT("작업 대상이 관리자 계정이 아닙니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
@@ -87,7 +100,8 @@ public enum ErrorTag {
     DUPLICATE_PENDING_CONTENT("이미 검수 대기 중인 콘텐츠입니다."),
 
     // 500 Internal Server Error
-    YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");
+    YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다."),
+    ARTICLE_IMAGE_UPLOAD_FAILED("이미지 업로드에 실패했습니다.");
 
     private final String message;
 

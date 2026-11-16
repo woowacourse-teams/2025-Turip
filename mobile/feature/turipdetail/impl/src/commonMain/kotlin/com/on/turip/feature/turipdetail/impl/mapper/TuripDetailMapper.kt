@@ -3,6 +3,7 @@ package com.on.turip.feature.turipdetail.impl.mapper
 import com.on.turip.core.model.bookmark.TuripPlace
 import com.on.turip.core.model.turip.Turip
 import com.on.turip.core.model.turip.TuripType
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.core.ui.model.turip.TuripEditModel
 import com.on.turip.core.ui.model.turip.TuripPlaceShareModel
 import com.on.turip.feature.turipdetail.impl.model.MapModel
@@ -20,7 +21,11 @@ fun TuripPlace.toUiModel(): TuripPlaceModel =
         latitude = place.latitude,
         longitude = place.longitude,
         category = place.category.joinToString(),
-        mapModel = MapModel.from(place.url),
+        mapModel =
+            MapModel.from(
+                url = place.url,
+                appleMap = AppleMap(place.name, place.latitude, place.longitude),
+            ),
     )
 
 fun TuripPlaceModel.toPlaceLatLngUiModel(): PlaceLatLngUiModel =

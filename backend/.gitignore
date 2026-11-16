@@ -49,8 +49,7 @@ Logging
 
 AI
 .claude
+.ua
 
 Firebase
 **/firebase-service-account*.json
-
-.ua

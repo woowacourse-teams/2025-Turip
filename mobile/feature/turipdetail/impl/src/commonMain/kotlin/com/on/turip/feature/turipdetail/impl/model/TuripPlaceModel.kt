@@ -1,5 +1,7 @@
 package com.on.turip.feature.turipdetail.impl.model
 
+import com.on.turip.core.ui.model.AppleMap
+
 data class TuripPlaceModel(
     val turipPlaceId: Long,
     val placeId: Long,
@@ -22,7 +24,7 @@ data class TuripPlaceModel(
                 order = 0L,
                 name = "",
                 category = "",
-                mapModel = MapModel.from(""),
+                mapModel = MapModel.from("", AppleMap.Idle),
                 isTuripPlace = false,
                 latitude = 0.0,
                 longitude = 0.0,

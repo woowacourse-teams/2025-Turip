@@ -9,6 +9,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.material.icons.extended)
+            implementation(libs.kotlinx.collections.immutable)
+            implementation(libs.coil.compose)
             implementation(project(":core:model"))
             implementation(project(":core:designsystem"))
         }

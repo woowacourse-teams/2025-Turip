@@ -5,3 +5,6 @@
 wiki/
 .wiki-compiler.json
 CLAUDE.md
+
+# macOS
+.DS_Store

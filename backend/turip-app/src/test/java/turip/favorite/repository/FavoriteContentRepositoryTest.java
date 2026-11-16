@@ -1,6 +1,6 @@
 package turip.favorite.repository;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -80,5 +80,44 @@ class FavoriteContentRepositoryTest {
         // then
         assertThat(favoriteContents.get(0).getId()).isEqualTo(favoriteContent2.getId());
         assertThat(favoriteContents.get(1).getId()).isEqualTo(favoriteContent1.getId());
+    }
+
+    @Test
+    @DisplayName("계정 id 목록, 콘텐츠 id, 기간으로 해당 계정들이 그 기간에 그 콘텐츠를 찜한 FavoriteContent만 조회한다")
+    void findByAccountIdInAndContentIdAndCreatedAtBetween1() {
+        // given
+        Country country = countryRepository.findByName("대한민국")
+                .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
+
+        City city = cityRepository.findByName("서울")
+                .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+
+        Creator creator = creatorRepository.save(new Creator("테스트 크리에이터", "https://example.com/profile.jpg"));
+
+        Content content1 = contentRepository.save(
+                new Content(creator, city, "테스트 컨텐츠 1", "https://example.com/content1", LocalDate.now()));
+        Content content2 = contentRepository.save(
+                new Content(creator, city, "테스트 컨텐츠 2", "https://example.com/content2", LocalDate.now()));
+
+        Account account1 = accountRepository.save(AccountFixture.createEntity());
+        Account account2 = accountRepository.save(AccountFixture.createEntity());
+        Account account3 = accountRepository.save(AccountFixture.createEntity());
+
+        LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(java.time.DayOfWeek.MONDAY);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(6);
+
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, account1, content1));
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, account2, content1));
+        // account3는 기간 밖(오늘 날짜)에 찜함 -> 조회 대상에서 제외되어야 함
+        favoriteContentRepository.save(new FavoriteContent(LocalDate.now(), account3, content1));
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, account1, content2));
+
+        // when
+        List<FavoriteContent> result = favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(
+                List.of(account1.getId(), account2.getId(), account3.getId()), content1.getId(), lastWeekMonday,
+                lastWeekSunday);
+
+        // then
+        assertThat(result).hasSize(2);
     }
 }

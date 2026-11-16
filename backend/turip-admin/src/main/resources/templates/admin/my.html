@@ -18,7 +18,7 @@
         .header {
             background: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px 40px;
+            padding: 15px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -26,6 +26,7 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+            height: 64px;
         }
 
         .admin-card {
@@ -123,6 +124,7 @@
             display: block;
         }
     </style>
+    <th:block th:replace="~{admin/fragments/sidebar :: sidebar-style}"></th:block>
 </head>
 <body>
 
@@ -131,7 +133,9 @@
     <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
 </div>
 
-<div class="container" style="margin-top: 80px;">
+<div class="layout">
+    <div class="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="main-content">
     <div class="admin-card">
         <div class="user-profile">
             <div class="user-avatar">
@@ -159,6 +163,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
     </div>
 </div>
 

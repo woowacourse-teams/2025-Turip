@@ -7,8 +7,9 @@ import com.on.turip.core.data.dto.turip.TuripInvitationTokenResponse
 import com.on.turip.core.data.dto.turip.TuripJoinResponse
 import com.on.turip.core.data.dto.turip.TuripMembersResponse
 import com.on.turip.core.data.dto.turip.TuripPatchRequest
+import com.on.turip.core.data.dto.turip.TuripPlaceCreationResponse
 import com.on.turip.core.data.dto.turip.TuripPlaceOrderRequest
-import com.on.turip.core.data.dto.turip.TuripPlaceResponse
+import com.on.turip.core.data.dto.turip.TuripPlacesBatchRequest
 import com.on.turip.core.data.dto.turip.TuripPlacesResponse
 import com.on.turip.core.data.dto.turip.TuripPostRequest
 import com.on.turip.core.data.dto.turip.TuripResponse
@@ -74,6 +75,11 @@ interface TuripService {
         @Query("turipId") turipId: Long,
         @Query("placeId") placeId: Long,
     )
+
+    @POST(ApiPath.V1 + "turips/places/batch")
+    suspend fun postTuripPlaces(
+        @Body turipPlacesBatchRequest: TuripPlacesBatchRequest,
+    ): List<TuripPlaceCreationResponse>
 
     @DELETE(ApiPath.V1 + "turips/places")
     suspend fun deleteTuripPlace(

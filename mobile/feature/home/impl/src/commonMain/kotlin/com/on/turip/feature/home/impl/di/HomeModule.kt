@@ -9,5 +9,5 @@ import org.koin.dsl.module
 
 val homeModule = module {
     single { HomeNavKeyProvider() } bind NavKeyProvider::class
-    viewModel<HomeViewModel> { HomeViewModel(get(), get(), get()) }
+    viewModel<HomeViewModel> { HomeViewModel(get(), get(), get(), get()) }
 }

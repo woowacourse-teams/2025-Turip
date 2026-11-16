@@ -1,0 +1,470 @@
+package turip.controller;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import turip.account.domain.Role;
+import turip.infrastructure.AdminArticleImageUploader;
+import turip.util.helper.TestDataHelper;
+
+@ActiveProfiles({"test", "h2"})
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = turip.TuripAdminApplication.class
+)
+class AdminArticleApiTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
+
+    @MockitoBean
+    private AdminArticleImageUploader adminArticleImageUploader;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+        testDataHelper.cleanDatabase();
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles POST 아티클 생성 테스트")
+    class CreateTest {
+
+        @Test
+        @DisplayName("관리자가 아티클을 생성하면 201 Created와 생성된 아티클 id를 응답한다")
+        void create1() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            Map<String, Object> request = Map.of(
+                    "title", "제목",
+                    "subtitle", "부제목",
+                    "content", "본문",
+                    "isPublished", true,
+                    "tagNames", List.of("여행", "행복"),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/v1/admin/articles")
+                    .then()
+                    .statusCode(201)
+                    .body(notNullValue());
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 아티클을 생성하면 403 Forbidden을 응답한다")
+        void create2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            Map<String, Object> request = Map.of(
+                    "title", "제목",
+                    "subtitle", "부제목",
+                    "content", "본문",
+                    "isPublished", false,
+                    "tagNames", List.of(),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/v1/admin/articles")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles GET 아티클 목록 조회 테스트")
+    class FindArticlesTest {
+
+        @Test
+        @DisplayName("관리자가 아티클 목록을 조회하면 공개·비공개 상관없이 200 OK와 목록을 응답한다")
+        void findArticles1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            createArticle(adminAccessToken, true);
+            createArticle(adminAccessToken, false);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/articles")
+                    .then()
+                    .statusCode(200)
+                    .body("articles", hasSize(2));
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 아티클 목록을 조회하면 403 Forbidden을 응답한다")
+        void findArticles2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().get("/api/v1/admin/articles")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/{id} GET 아티클 상세 조회 테스트")
+    class GetArticleTest {
+
+        @Test
+        @DisplayName("관리자가 비공개 아티클을 상세 조회해도 200 OK와 상세 정보를 응답한다")
+        void getArticle1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(200)
+                    .body("id", notNullValue());
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 아티클을 조회하면 404 Not Found를 응답한다")
+        void getArticle2() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/articles/999")
+                    .then()
+                    .statusCode(404);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/{id} PATCH 아티클 수정 테스트")
+    class UpdateTest {
+
+        @Test
+        @DisplayName("관리자가 아티클을 수정하면 200 OK와 수정된 아티클을 응답한다")
+        void update1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+
+            Map<String, Object> request = Map.of(
+                    "title", "새 제목",
+                    "subtitle", "새 부제목",
+                    "content", "새 본문",
+                    "isPublished", true,
+                    "tagNames", List.of("여행"),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(200)
+                    .body("title", is("새 제목"))
+                    .body("isPublished", is(true))
+                    .body("tags", hasSize(1));
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 아티클을 수정하면 404 Not Found를 응답한다")
+        void update2() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+
+            Map<String, Object> request = Map.of(
+                    "title", "새 제목",
+                    "subtitle", "새 부제목",
+                    "content", "새 본문",
+                    "isPublished", true,
+                    "tagNames", List.of(),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/999")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 아티클을 수정하면 403 Forbidden을 응답한다")
+        void update3() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            Map<String, Object> request = Map.of(
+                    "title", "새 제목",
+                    "subtitle", "새 부제목",
+                    "content", "새 본문",
+                    "isPublished", true,
+                    "tagNames", List.of(),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/{id} DELETE 아티클 삭제 테스트")
+    class RemoveTest {
+
+        @Test
+        @DisplayName("관리자가 아티클을 삭제하면 204 No Content를 응답한다")
+        void remove1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().delete("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(204);
+
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(404);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 아티클을 삭제하면 404 Not Found를 응답한다")
+        void remove2() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().delete("/api/v1/admin/articles/999")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 아티클을 삭제하면 403 Forbidden을 응답한다")
+        void remove3() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().delete("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/images POST 아티클 이미지 업로드 테스트")
+    class UploadImageTest {
+
+        @Test
+        @DisplayName("관리자가 이미지를 업로드하면 201 Created와 업로드된 이미지 URL을 응답한다")
+        void uploadImage1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            String expectedUrl = "https://test-bucket.s3.ap-northeast-2.amazonaws.com/article/abc.png";
+            when(adminArticleImageUploader.upload(any()))
+                    .thenReturn(expectedUrl);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .multiPart("image", "photo.png", "dummy-image-bytes".getBytes(), "image/png")
+                    .when().post("/api/v1/admin/articles/images")
+                    .then()
+                    .statusCode(201)
+                    .body("url", is(expectedUrl));
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 이미지를 업로드하면 403 Forbidden을 응답한다")
+        void uploadImage2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .multiPart("image", "photo.png", "dummy-image-bytes".getBytes(), "image/png")
+                    .when().post("/api/v1/admin/articles/images")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/order PATCH 아티클 순서 재배치 테스트")
+    class ReorderTest {
+
+        @Test
+        @DisplayName("관리자가 순서를 재배치하면 200 OK를 응답하고 순서가 반영된다")
+        void reorder1() {
+            // given
+            // AdminArticleService.create()는 displayOrder를 findMinDisplayOrder()-1로 배정한다.
+            // 빈 DB에서 첫 생성(articleId1)은 0, 두 번째 생성(articleId2)은 -1이 된다.
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId1 = createArticle(adminAccessToken, false);
+            Long articleId2 = createArticle(adminAccessToken, false);
+
+            Map<String, Object> request = Map.of(
+                    "orders", List.of(
+                            Map.of("id", articleId1, "displayOrder", -1),
+                            Map.of("id", articleId2, "displayOrder", 0)
+                    )
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/order")
+                    .then()
+                    .statusCode(200);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 id가 섞여 있으면 400 Bad Request를 응답한다")
+        void reorder2() {
+            // given
+            // 빈 DB에서 첫 생성이므로 articleId1의 displayOrder는 0이다.
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId1 = createArticle(adminAccessToken, false);
+
+            Map<String, Object> request = Map.of(
+                    "orders", List.of(
+                            Map.of("id", articleId1, "displayOrder", 0),
+                            Map.of("id", 999999L, "displayOrder", -1)
+                    )
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/order")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 순서를 재배치하면 403 Forbidden을 응답한다")
+        void reorder3() {
+            // given
+            // 빈 DB에서 첫 생성이므로 articleId1의 displayOrder는 0이다.
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId1 = createArticle(adminAccessToken, false);
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            Map<String, Object> request = Map.of(
+                    "orders", List.of(
+                            Map.of("id", articleId1, "displayOrder", 0)
+                    )
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/order")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    private String createAdminAccessToken() {
+        Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+        testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+        return testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+    }
+
+    private Long createArticle(String adminAccessToken, boolean isPublished) {
+        Map<String, Object> request = Map.of(
+                "title", "제목",
+                "subtitle", "부제목",
+                "content", "본문",
+                "isPublished", isPublished,
+                "tagNames", List.of(),
+                "placeIds", List.of()
+        );
+
+        return RestAssured.given().port(port)
+                .header("Authorization", "Bearer " + adminAccessToken)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/api/v1/admin/articles")
+                .then()
+                .extract().as(Long.class);
+    }
+}

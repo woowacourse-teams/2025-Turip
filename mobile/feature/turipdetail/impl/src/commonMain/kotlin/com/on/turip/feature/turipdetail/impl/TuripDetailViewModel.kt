@@ -481,8 +481,9 @@ class TuripDetailViewModel(
         }
     }
 
+    // 길이 제한은 NameEditorSheetContent 의 InputTransformation 이 담당한다.
+    // 여기서 입력을 되돌리면 iOS 한글 IME 의 조합이 깨진다.
     fun updateInputName(name: String) {
-        if (name.length > MAX_NAME_LENGTH) return
         val editModel: ImmutableList<TuripEditModel> = _uiState.value.editModels
         val status: TuripNameStatusModel = TuripNameStatusModel.of(name, editModel)
         _uiState.update {
@@ -493,16 +494,20 @@ class TuripDetailViewModel(
         }
     }
 
-    fun updateTuripName() {
+    fun updateTuripName(name: String = uiState.value.inputTuripName) {
+        val status: TuripNameStatusModel = TuripNameStatusModel.of(name, uiState.value.editModels)
+        if (!status.isConfirmEnabled) return
+        _uiState.update { it.copy(inputTuripName = name, turipNameStatus = status) }
+
         viewModelScope.launch {
             turipRepository
-                .updateTurip(uiState.value.selectedTurip.id, uiState.value.inputTuripName)
+                .updateTurip(uiState.value.selectedTurip.id, name)
                 .onSuccess {
                     _uiState.update { state: TuripDetailUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            selectedTurip = uiState.value.selectedTurip.copy(name = uiState.value.inputTuripName),
+                            selectedTurip = uiState.value.selectedTurip.copy(name = name),
                             inputTuripName = "",
                         )
                     }
@@ -800,7 +805,6 @@ class TuripDetailViewModel(
 
     companion object {
         private const val INVALID_ID = -1L
-        private const val MAX_NAME_LENGTH = 20
         private const val UNSTABLE_NETWORK_RETRY_THRESHOLD = 2
         private const val FLUSH_DELETE_TIMEOUT_MILLIS = 3_000L
         private const val APP_LINK_TURIP_INVITATION_HOST = "invite.turip.kro.kr"

@@ -271,7 +271,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, oldName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when
@@ -299,7 +299,7 @@ class FavoriteFolderServiceTest {
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(nonExistentFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(nonExistentFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -321,7 +321,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, oldName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .given(favoriteFolderAccountService).validateMembership(requestAccount, favoriteFolder);
@@ -345,7 +345,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolder newFavoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(newFolderId, newName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(newFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(newFolderId))
                     .willReturn(Optional.of(newFavoriteFolder));
             given(favoriteFolderRepository.findAllByAccount(account))
                     .willReturn(List.of(oldFavoriteFolder));
@@ -368,7 +368,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, oldName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when & then
@@ -388,7 +388,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createDefaultFolderWithId(folderId);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when & then
@@ -591,7 +591,7 @@ class FavoriteFolderServiceTest {
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, folderName);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when
@@ -615,7 +615,7 @@ class FavoriteFolderServiceTest {
 
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
 
-            given(favoriteFolderRepository.findById(nonExistentFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(nonExistentFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -635,7 +635,7 @@ class FavoriteFolderServiceTest {
             Account requestAccount = AccountFixture.createCustomAccount(requestAccountId, Role.USER);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, folderName);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .given(favoriteFolderAccountService).validateOwnership(requestAccount, favoriteFolder);
@@ -655,7 +655,7 @@ class FavoriteFolderServiceTest {
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createDefaultFolderWithId(folderId);
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when & then
@@ -674,7 +674,7 @@ class FavoriteFolderServiceTest {
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createSharedFolder("공유 폴더");
 
-            given(favoriteFolderRepository.findById(folderId))
+            given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when & then

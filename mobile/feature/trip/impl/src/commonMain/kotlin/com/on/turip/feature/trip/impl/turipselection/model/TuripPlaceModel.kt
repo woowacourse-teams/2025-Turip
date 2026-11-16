@@ -1,5 +1,6 @@
 package com.on.turip.feature.trip.impl.turipselection.model
 
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.core.ui.model.turip.TuripPlaceShareModel
 import com.on.turip.feature.trip.impl.model.MapModel
 
@@ -31,7 +32,7 @@ data class TuripPlaceModel(
                 order = 0L,
                 name = "",
                 category = "",
-                mapModel = MapModel.from(""),
+                mapModel = MapModel.from("", AppleMap.Idle),
                 isTuripPlace = false,
                 latitude = 0.0,
                 longitude = 0.0,

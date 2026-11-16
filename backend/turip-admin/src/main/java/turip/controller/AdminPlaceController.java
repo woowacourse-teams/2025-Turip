@@ -1,13 +1,17 @@
 package turip.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.domain.TuripMember;
+import turip.place.controller.dto.response.PlaceResponse;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchType;
+import turip.resolver.AuthAdmin;
 import turip.service.AdminPlaceService;
 
 @RestController
@@ -23,6 +27,16 @@ public class AdminPlaceController {
             @RequestParam PlaceSearchType type
     ) {
         PlaceSearchResponse response = adminPlaceService.searchPlaces(query, type);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PlaceResponse>> findPlaces(
+            @AuthAdmin TuripMember admin,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false, defaultValue = "20") Integer size
+    ) {
+        List<PlaceResponse> response = adminPlaceService.findPlaces(query, size);
         return ResponseEntity.ok(response);
     }
 }

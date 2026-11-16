@@ -1,8 +1,11 @@
 package turip.region.api;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import turip.infrastructure.client.KoreaTourismImageClient;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles({"test", "h2"})
@@ -27,9 +32,16 @@ class RegionCategoryApiTest {
     @Autowired
     private TestDataHelper testDataHelper;
 
+    @MockitoBean
+    private KoreaTourismImageClient koreaTourismImageClient;
+
     @BeforeEach
     void setUp() {
         testDataHelper.cleanDatabase();
+
+        // KoreaTourismApiClient mock 설정 - 실제 API 호출하지 않도록
+        when(koreaTourismImageClient.searchRegionImage(anyString()))
+                .thenReturn(Optional.empty());
     }
 
     @DisplayName("/api/v1/region-categories GET 지역 카테고리 조회 테스트")
@@ -162,11 +174,11 @@ class RegionCategoryApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (title, url, uploaded_date, creator_id, city_id) VALUES ('부산컨텐츠1', 'https://example.com/busan1', '2024-01-03', 1, 2)");
 
-            // 국내 기타 지역에 컨텐츠 추가 (대구는 DomesticRegionCategory에 포함되지 않음)
+            // 국내 기타 지역에 컨텐츠 추가 (광주는 DomesticRegionCategory에 포함되지 않음)
             jdbcTemplate.update(
-                    "INSERT INTO city (name, country_id, image_url) VALUES ('대구', 1, 'https://example.com/daegu.jpg')");
+                    "INSERT INTO city (name, country_id, image_url) VALUES ('광주', 1, 'https://example.com/gwangju.jpg')");
             jdbcTemplate.update(
-                    "INSERT INTO content (title, url, uploaded_date, creator_id, city_id) VALUES ('대구컨텐츠1', 'https://example.com/daegu1', '2024-01-04', 1, 3)");
+                    "INSERT INTO content (title, url, uploaded_date, creator_id, city_id) VALUES ('광주컨텐츠1', 'https://example.com/gwangju1', '2024-01-04', 1, 3)");
 
             // when & then
             RestAssured.given().port(port)
@@ -174,10 +186,10 @@ class RegionCategoryApiTest {
                     .when().get("/api/v1/region-categories")
                     .then()
                     .statusCode(200)
-                    .body("regionCategories.size()", is(3)) // 서울, 부산, 국내 기타 (대구는 국내 기타에 포함)
+                    .body("regionCategories.size()", is(3)) // 서울, 부산, 국내 기타 (광주는 국내 기타에 포함)
                     .body("regionCategories[0].regionCategoryName", is("서울")) // 컨텐츠 2개
                     .body("regionCategories[1].regionCategoryName", is("부산")) // 컨텐츠 1개
-                    .body("regionCategories[2].regionCategoryName", is("국내 기타")); // 대구 컨텐츠 1개 포함
+                    .body("regionCategories[2].regionCategoryName", is("국내 기타")); // 광주 컨텐츠 1개 포함
         }
     }
 } 
