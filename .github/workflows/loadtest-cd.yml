@@ -21,7 +21,6 @@ env:
   SPRING_PROFILES_ACTIVE: loadtest
   APP_JAVA_XMS: 256m
   APP_JAVA_XMX: 384m
-  SERVER_TOMCAT_THREADS_MAX: 10
 
 jobs:
   build:
@@ -107,7 +106,6 @@ jobs:
           ARTICLE_DEFAULT_THUMBNAIL_URL=${{ secrets.ARTICLE_DEFAULT_THUMBNAIL_URL }}
           APP_JAVA_XMS=${{ env.APP_JAVA_XMS }}
           APP_JAVA_XMX=${{ env.APP_JAVA_XMX }}
-          SERVER_TOMCAT_THREADS_MAX=${{ env.SERVER_TOMCAT_THREADS_MAX }}
           ENVEOF
 
       - name: Login to Docker Hub

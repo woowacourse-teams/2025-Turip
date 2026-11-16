@@ -25,7 +25,6 @@ services:
       JAVA_XMS: ${APP_JAVA_XMS:-256m}
       JAVA_XMX: ${APP_JAVA_XMX:-384m}
       JAVA_OPTS: ${JAVA_OPTS:-}
-      SERVER_TOMCAT_THREADS_MAX: ${SERVER_TOMCAT_THREADS_MAX:-10}
     networks:
       - turip-network
     volumes:
@@ -45,7 +44,6 @@ services:
       JAVA_XMS: ${APP_JAVA_XMS:-256m}
       JAVA_XMX: ${APP_JAVA_XMX:-384m}
       JAVA_OPTS: ${JAVA_OPTS:-}
-      SERVER_TOMCAT_THREADS_MAX: ${SERVER_TOMCAT_THREADS_MAX:-10}
     networks:
       - turip-network
     volumes:
