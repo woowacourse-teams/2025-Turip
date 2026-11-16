@@ -7,13 +7,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
-import java.util.concurrent.Executor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.infrastructure.client.dto.RelatedSpotResult;
@@ -25,19 +25,11 @@ import turip.region.service.dto.RelatedSpotsResult;
 @ExtendWith(MockitoExtension.class)
 class RelatedSpotServiceTest {
 
-    @Mock
-    private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
-
+    @InjectMocks
     private RelatedSpotService relatedSpotService;
 
-    @BeforeEach
-    void setUp() {
-        // 호출한 스레드에서 그대로 실행하는 Executor.
-        // 병렬 실행 여부는 이 테스트의 검증 대상이 아니고, 결과 조합과 폴백 판정만 확인하면 되므로
-        // 스레드풀을 띄우지 않고 결정적으로 동작하게 한다.
-        Executor directExecutor = Runnable::run;
-        relatedSpotService = new RelatedSpotService(koreaTourismRelatedSpotClient, directExecutor);
-    }
+    @Mock
+    private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
 
     @DisplayName("지역 카테고리로 연관 관광지를 조회한다")
     @Test
@@ -58,14 +50,14 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 각각 모킹
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(RelatedSpotResult.success(List.of(spot1)));
+                .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot1))));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(RelatedSpotResult.success(List.of(spot2)));
+                .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot2))));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(RelatedSpotResult.success(List.of(spot3)));
+                .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot3))));
 
         // when
-        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category);
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
 
         // then
         RelatedSpotsResponse response = result.response();
@@ -97,14 +89,14 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 모두 실패 반환
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(RelatedSpotResult.failure());
+                .willReturn(Mono.just(RelatedSpotResult.failure()));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(RelatedSpotResult.failure());
+                .willReturn(Mono.just(RelatedSpotResult.failure()));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(RelatedSpotResult.failure());
+                .willReturn(Mono.just(RelatedSpotResult.failure()));
 
         // when
-        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category);
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
 
         // then
         assertAll(
@@ -121,14 +113,14 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 성공했지만 빈 데이터 반환
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(RelatedSpotResult.success(List.of()));
+                .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(RelatedSpotResult.success(List.of()));
+                .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(RelatedSpotResult.success(List.of()));
+                .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
 
         // when
-        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category);
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
 
         // then
         assertAll(
