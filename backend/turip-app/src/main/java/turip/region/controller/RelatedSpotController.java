@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.service.RelatedSpotService;
+import turip.region.service.dto.RelatedSpotsResult;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,13 +70,13 @@ public class RelatedSpotController {
             )
     })
     @GetMapping("/related-spots")
-    public Mono<ResponseEntity<RelatedSpotsResponse>> readRelatedSpots(
+    public ResponseEntity<RelatedSpotsResponse> readRelatedSpots(
             @Parameter(description = "지역 카테고리", required = true, example = "서울")
             @RequestParam(name = "regionCategory") DomesticRegionCategory regionCategory
     ) {
-        return relatedSpotService.findRelatedSpotsByRegionCategory(regionCategory)
-                .map(result -> ResponseEntity.ok()
-                        .header(DATA_SOURCE_HEADER, result.dataSource().getValue())
-                        .body(result.response()));
+        RelatedSpotsResult result = relatedSpotService.findRelatedSpotsByRegionCategory(regionCategory);
+        return ResponseEntity.ok()
+                .header(DATA_SOURCE_HEADER, result.dataSource().getValue())
+                .body(result.response());
     }
 }
