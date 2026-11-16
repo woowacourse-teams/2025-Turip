@@ -36,14 +36,14 @@
 //   따라서 "요구 동시 외부 호출 수" = VU × 3 이다.
 //
 // ── VU 단계를 고른 이유 ────────────────────────────────────────────────────
-//   VU=2  : 외부 호출 6건.  저부하 기준점. 세 조건 모두 여유 있는 구간.
-//   VU=4  : 외부 호출 12건. 커넥션풀 초과 시작 (대기/큐잉 발생 예상 지점).
-//   VU=6  : 외부 호출 18건. 커넥션 대기 누적. 톰캣 스레드(10)도 압박받기 시작.
-//   VU=8  : 외부 호출 24건. 블로킹 조건(restclient/vthread)의 톰캣 스레드 포화 근처.
-//   VU=10 : 외부 호출 30건. 커넥션풀 3배 과포화.
-//   VU=15 : 외부 호출 45건. 4.5배 과포화. 블로킹 조건의 큐 대기가 본격화되는 구간.
-//   VU=20 : 외부 호출 60건. 6배 과포화.
-//   VU=30 : 외부 호출 90건. 9배 과포화. 세 조건의 한계 지점을 관찰한다.
+//   think time 2초가 있으므로 VU 수가 곧 동시 요청 수는 아니다. VU는 "응답을 기다리거나
+//   대기 중인 가상 사용자 수"이고, 실제 동시 요청 수는 응답 시간에 비례해 그보다 작다.
+//   예컨대 응답이 500ms면 VU 1개가 2.5초 주기로 1건을 보내므로 VU 30에서 초당 약 12요청,
+//   동시 요청은 그보다 훨씬 적다. 따라서 아래 단계는 "부하의 상대적 크기"로 읽어야 한다.
+//
+//   VU=2, 4, 6, 8   : 저부하 ~ 중부하. 세 조건 모두 여유 있는 구간이 어디까지인지 본다.
+//   VU=10, 15       : 블로킹 조건(전용 풀 10)의 대기가 나타나기 시작하는 구간.
+//   VU=20, 30       : 고부하. 세 조건의 차이와 한계 지점을 관찰한다.
 //
 //   VU 30 구간에서는 외부 API가 429(Too Many Requests)를 반환하기 시작한다.
 //   조건 1 측정에서 전체 호출 15,939건 중 853건(5.4%)이 429였고, 요청 단위
@@ -66,7 +66,7 @@
 //   크레딧이 바닥난 상태에서 측정하면 뒤에 돌린 조건이 불리해져 비교가 불공정해진다.
 
 import http from "k6/http";
-import { check } from "k6";
+import { check, sleep } from "k6";
 import { Trend, Counter, Rate } from "k6/metrics";
 
 const BASE_URL = __ENV.BASE_URL || "http://turip.o-r.kr";
@@ -75,15 +75,23 @@ const REGIONS = ["서울", "인천", "부산"];
 
 const DATA_SOURCE_HEADER = "X-Data-Source";
 
+// 반복 사이의 대기 시간(초).
+// think time이 없으면 응답이 빠른 조건일수록 다음 요청을 더 빨리 보내게 되어,
+// 같은 VU에서도 조건마다 총 요청 수와 외부 API 호출량이 크게 달라진다.
+// 그러면 처리량이 높은 조건이 외부 API의 429에 더 많이 걸려 불리해지므로 비교가 불공정해진다.
+// 2초는 조건 1의 응답 시간(avg 676ms, p95 1.8s)을 덮는 값이라, 반복 주기가 응답 시간보다
+// 대기 시간에 지배되어 조건 간 요청 수가 비슷해진다.
+const THINK_TIME = Number(__ENV.THINK_TIME || 2);
+
 const STAGES = [
-    { vus: 2, label: "VU=2  (저부하 기준점, 외부 호출 6건)" },
-    { vus: 4, label: "VU=4  (커넥션풀 초과 시작, 12건)" },
-    { vus: 6, label: "VU=6  (커넥션 대기 누적, 18건)" },
-    { vus: 8, label: "VU=8  (톰캣 스레드 포화 근처, 24건)" },
-    { vus: 10, label: "VU=10 (커넥션풀 3배 과포화, 30건)" },
-    { vus: 15, label: "VU=15 (4.5배 과포화, 45건)" },
-    { vus: 20, label: "VU=20 (6배 과포화, 60건)" },
-    { vus: 30, label: "VU=30 (9배 과포화, 90건 - 한계 관찰)" },
+    { vus: 2, label: "VU=2  (저부하 기준점)" },
+    { vus: 4, label: "VU=4" },
+    { vus: 6, label: "VU=6" },
+    { vus: 8, label: "VU=8  (중부하)" },
+    { vus: 10, label: "VU=10 (블로킹 조건의 대기 시작 예상)" },
+    { vus: 15, label: "VU=15" },
+    { vus: 20, label: "VU=20 (고부하)" },
+    { vus: 30, label: "VU=30 (한계 관찰)" },
 ];
 
 const RAMP_TIME = __ENV.RAMP_TIME || "5s";
@@ -150,6 +158,7 @@ export default function () {
         httpErrorCount.add(1);
         fallbackRate.add(false);
         check(res, { "status is 200": () => false });
+        sleep(THINK_TIME);
         return;
     }
 
@@ -162,6 +171,7 @@ export default function () {
         // 이 경우 폴백 구분이 불가능하므로 측정값을 신뢰할 수 없다. 즉시 드러나도록 센다.
         missingHeaderCount.add(1);
         check(res, { "X-Data-Source 헤더 존재": () => false });
+        sleep(THINK_TIME);
         return;
     }
 
@@ -186,6 +196,8 @@ export default function () {
         "status is 200": (r) => r.status === 200,
         "외부 API 데이터로 응답": () => !isFallback,
     });
+
+    sleep(THINK_TIME);
 }
 
 export function handleSummary(data) {
@@ -218,7 +230,9 @@ export function handleSummary(data) {
         `=== 연관 관광지 조회 부하테스트 결과 [${VARIANT}] ===`,
         `BASE_URL : ${BASE_URL}`,
         `VU 단계  : ${STAGES.map((s) => s.vus).join(" -> ")}`,
+        `think time : ${THINK_TIME}초 (조건 간 요청 수 편차를 줄이기 위함)`,
         `총 요청  : ${totalReqs} (외부 API 호출 약 ${totalReqs * 3}회)`,
+        `평균 처리량 : ${m.http_reqs ? m.http_reqs.values.rate.toFixed(2) : "N/A"} req/s`,
         "",
         "── 응답 시간 ──────────────────────────────────────────",
         `전체 응답     : ${fmt(m.spots_duration_total)}   ← 조건 비교의 기본 지표`,
