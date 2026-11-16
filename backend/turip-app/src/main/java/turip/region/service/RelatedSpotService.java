@@ -1,10 +1,11 @@
 package turip.region.service;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
@@ -27,18 +28,18 @@ public class RelatedSpotService {
         this.koreaTourismRelatedSpotClient = koreaTourismRelatedSpotClient;
     }
 
-    public Mono<RelatedSpotsResult> findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
+    public RelatedSpotsResult findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
         TourApiAreaCode areaCode = parseToAreaCode(category);
         if (!areaCode.isFound()) {
             log.warn("지역 카테고리에 매핑되는 TourAPI 지역 코드를 찾을 수 없습니다: {}", category);
-            return Mono.just(RelatedSpotsResult.of(
+            return RelatedSpotsResult.of(
                     RelatedSpotsResponse.empty(),
                     RelatedSpotsDataSource.NOT_REQUESTED
-            ));
+            );
         }
 
-        return getRelatedSpotsByAreaCode(areaCode)
-                .map(results -> toRelatedSpotsResult(category, results));
+        List<RelatedSpotResult> results = getRelatedSpotsByAreaCode(areaCode);
+        return toRelatedSpotsResult(category, results);
     }
 
     private TourApiAreaCode parseToAreaCode(DomesticRegionCategory category) {
@@ -48,18 +49,45 @@ public class RelatedSpotService {
         return TourApiAreaCode.fromDomesticRegionCategory(category);
     }
 
-    private Mono<List<RelatedSpotResult>> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
-        // 여러 시군구 코드에 대해 WebClient로 비동기 논블로킹 병렬 호출
-        List<Mono<RelatedSpotResult>> monos = areaCode.getSigunguCodes().stream()
-                .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
-                        areaCode.getAreaCode(),
-                        sigunguCode
-                ))
-                .toList();
+    /**
+     * 시군구 코드별로 외부 API를 병렬 호출한다 (부하테스트 조건 3: 가상 스레드).
+     * <p>
+     * 조건 1과 비교했을 때 바뀐 것은 "병렬 실행 수단" 하나뿐이다. 외부 호출이 블로킹이라는 점도,
+     * 호출부인 톰캣 스레드가 결과를 기다린다는 점도 같다. 따라서 두 조건의 차이는 고정 크기
+     * 스레드풀과 가상 스레드의 차이로만 설명된다.
+     * <p>
+     * 가상 스레드는 생성 비용이 낮아 풀링하지 않고 호출마다 새로 띄운다. 블로킹되면 캐리어
+     * 스레드를 반납하고 언마운트되므로, 조건 1처럼 풀 크기가 동시 호출 수의 상한이 되지 않는다.
+     * <p>
+     * spring.threads.virtual.enabled는 켜지 않는다. 그 플래그는 톰캣 워커까지 가상 스레드로
+     * 바꾸기 때문에, 켜면 바뀌는 변수가 둘이 되어 가상 스레드 자체의 효과를 분리할 수 없다.
+     * 여기서 쓰는 Executors.newVirtualThreadPerTaskExecutor()는 JDK API라 그 플래그와 무관하게
+     * 동작한다.
+     */
+    private List<RelatedSpotResult> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
+        // close()가 제출된 작업의 완료를 기다리므로 try-with-resources가 곧 완료 대기 지점이 된다.
+        try (ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<RelatedSpotResult>> futures = areaCode.getSigunguCodes().stream()
+                    .map(sigunguCode -> CompletableFuture.supplyAsync(
+                            () -> koreaTourismRelatedSpotClient.searchRelatedSpots(
+                                    areaCode.getAreaCode(),
+                                    sigunguCode
+                            ),
+                            virtualThreadExecutor
+                    ))
+                    .toList();
 
-        return Mono.zip(monos, results -> Arrays.stream(results)
-                .map(result -> (RelatedSpotResult) result)
-                .toList());
+            return futures.stream()
+                    .map(future -> {
+                        try {
+                            return future.join();
+                        } catch (Exception e) {
+                            log.warn("연관 관광지 API 호출 중 예외 발생: {}", e.getMessage());
+                            return RelatedSpotResult.failure();
+                        }
+                    })
+                    .toList();
+        }
     }
 
     private RelatedSpotsResult toRelatedSpotsResult(DomesticRegionCategory category,
