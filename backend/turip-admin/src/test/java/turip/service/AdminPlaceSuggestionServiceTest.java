@@ -2,12 +2,15 @@ package turip.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -63,6 +66,26 @@ class AdminPlaceSuggestionServiceTest {
         // then
         assertThat(response.suggestions()).isEmpty();
         assertThat(response.totalTokenCount()).isNull();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = {
+            "https://youtu.be/dQw4w9WgXcQ?si=abcdEFGH1234",
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=540s",
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc&index=8",
+            "dQw4w9WgXcQ"
+    })
+    @DisplayName("부가 파라미터가 붙은 URL이나 videoId만 입력해도 정규화한 watch URL로 장소를 추론한다")
+    void getSuggestions_withVariousUrlForms_infersWithNormalizedUrl(String input) {
+        // given
+        when(geminiVideoPlaceInferenceService.inferPlaces(videoUrl))
+                .thenReturn(GeminiVideoPlaceInferenceResponse.success(List.of(), "gemini-3.8-flash", 10));
+
+        // when
+        adminPlaceSuggestionService.getSuggestions(input);
+
+        // then
+        verify(geminiVideoPlaceInferenceService).inferPlaces(videoUrl);
     }
 
     @Test

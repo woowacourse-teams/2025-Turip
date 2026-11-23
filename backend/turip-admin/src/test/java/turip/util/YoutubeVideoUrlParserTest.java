@@ -60,6 +60,16 @@ class YoutubeVideoUrlParserTest {
     }
 
     @Test
+    @DisplayName("videoId로 부가 파라미터가 없는 정규 watch URL을 만든다")
+    void toWatchUrl_withVideoId_returnsCanonicalWatchUrl() {
+        // when
+        String result = YoutubeVideoUrlParser.toWatchUrl("dQw4w9WgXcQ");
+
+        // then
+        assertThat(result).isEqualTo("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    }
+
+    @Test
     @DisplayName("입력이 null이거나 공백이면 null을 반환한다")
     void extractVideoId_withNullOrBlank_returnsNull() {
         assertThat(YoutubeVideoUrlParser.extractVideoId(null)).isNull();
