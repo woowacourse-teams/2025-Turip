@@ -3,18 +3,23 @@ package turip.infrastructure.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import turip.infrastructure.client.dto.GeminiGenerateContentResponse;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse.GeminiInferenceStatus;
@@ -57,6 +62,7 @@ class GeminiVideoPlaceInferenceClientTest {
     private void stubRequestChain() {
         when(restClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.header(anyString(), any(String[].class))).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
         when(requestBodySpec.body(any(Object.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
@@ -84,6 +90,28 @@ class GeminiVideoPlaceInferenceClientTest {
         assertThat(response.totalTokenCount()).isEqualTo(1234);
         assertThat(response.places()).hasSize(1);
         assertThat(response.places().get(0).placeName()).isEqualTo("해운대 해수욕장");
+    }
+
+    @Test
+    @DisplayName("API 키는 URL 쿼리 파라미터가 아니라 x-goog-api-key 헤더로 전달한다")
+    @SuppressWarnings("unchecked")
+    void inferPlaces_sendsApiKeyViaHeaderNotQueryParam() {
+        // given
+        stubRequestChain();
+        when(responseSpec.body(GeminiGenerateContentResponse.class)).thenReturn(buildGeminiResponse("[]", 10));
+
+        // when
+        geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash", "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+
+        // then
+        verify(requestBodySpec).header("x-goog-api-key", "test-key");
+
+        ArgumentCaptor<Function<UriBuilder, URI>> uriCaptor = ArgumentCaptor.forClass(Function.class);
+        verify(requestBodyUriSpec).uri(uriCaptor.capture());
+        URI requestUri = uriCaptor.getValue().apply(UriComponentsBuilder.fromUriString("https://test.gemini.com"));
+        assertThat(requestUri.toString())
+                .isEqualTo("https://test.gemini.com/gemini-3.8-flash:generateContent")
+                .doesNotContain("test-key");
     }
 
     private GeminiGenerateContentResponse buildGeminiResponse(String innerJsonText, int totalTokenCount) {
