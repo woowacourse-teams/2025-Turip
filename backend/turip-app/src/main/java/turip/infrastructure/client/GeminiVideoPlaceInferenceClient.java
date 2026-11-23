@@ -1,6 +1,10 @@
 package turip.infrastructure.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +12,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import turip.infrastructure.client.dto.GeminiGenerateContentResponse;
+import turip.infrastructure.client.dto.GeminiGenerateContentResponse.UsageMetadata;
 import turip.infrastructure.client.dto.GeminiVideoInferredPlace;
 import turip.infrastructure.client.dto.GeminiVideoInferredPlaces;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
@@ -25,6 +31,7 @@ import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
 public class GeminiVideoPlaceInferenceClient {
 
     private static final String API_KEY_HEADER = "x-goog-api-key";
+    private static final int LOG_TEXT_MAX_LENGTH = 500;
 
     private static final double FPS = 0.5;
 
@@ -56,6 +63,12 @@ public class GeminiVideoPlaceInferenceClient {
     }
 
     public GeminiVideoPlaceInferenceResponse inferPlaces(String modelName, String youtubeUrl) {
+        long startedAt = System.currentTimeMillis();
+        GeminiVideoPlaceInferenceResponse result = request(modelName, youtubeUrl);
+        return result.withElapsedMs(System.currentTimeMillis() - startedAt);
+    }
+
+    private GeminiVideoPlaceInferenceResponse request(String modelName, String youtubeUrl) {
         Map<String, Object> requestBody = buildRequestBody(youtubeUrl);
 
         GeminiGenerateContentResponse response;
@@ -72,18 +85,28 @@ public class GeminiVideoPlaceInferenceClient {
                         throw new QuotaExceededSignal();
                     })
                     .onStatus(HttpStatusCode::isError, (request, res) -> {
-                        throw new RetryableFailureSignal();
+                        throw new HttpErrorSignal(res.getStatusCode().value(), readBody(res));
                     })
                     .body(GeminiGenerateContentResponse.class);
         } catch (QuotaExceededSignal e) {
-            log.warn("[Gemini] 영상 장소 추론 쿼터 초과(429): model={}", modelName);
+            log.warn("[Gemini] 영상 장소 추론 쿼터 초과(429): model={}, video={}", modelName, youtubeUrl);
             return GeminiVideoPlaceInferenceResponse.quotaExceeded(modelName);
+        } catch (HttpErrorSignal e) {
+            log.warn("[Gemini] 영상 장소 추론 HTTP 오류: model={}, video={}, status={}, body={}",
+                    modelName, youtubeUrl, e.statusCode, e.body);
+            return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName, "HTTP " + e.statusCode);
         } catch (Exception e) {
-            log.warn("[Gemini] 영상 장소 추론 호출 실패: model={}, message={}", modelName, e.getMessage());
-            return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName);
+            if (isTimeout(e)) {
+                log.warn("[Gemini] 영상 장소 추론 타임아웃: model={}, video={}", modelName, youtubeUrl);
+                return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName, "TIMEOUT");
+            }
+            log.warn("[Gemini] 영상 장소 추론 호출 실패: model={}, video={}, exception={}, message={}",
+                    modelName, youtubeUrl, e.getClass().getSimpleName(), e.getMessage());
+            return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName,
+                    "REQUEST_ERROR(" + e.getClass().getSimpleName() + ")");
         }
 
-        return parseResponse(response, modelName);
+        return parseResponse(response, modelName, youtubeUrl);
     }
 
     private Map<String, Object> buildRequestBody(String youtubeUrl) {
@@ -104,24 +127,68 @@ public class GeminiVideoPlaceInferenceClient {
         );
     }
 
-    private GeminiVideoPlaceInferenceResponse parseResponse(GeminiGenerateContentResponse response, String modelName) {
-        try {
-            String text = response.extractResponseText().orElseThrow();
-            List<GeminiVideoInferredPlace> places =
-                    objectMapper.readValue(text, GeminiVideoInferredPlaces.class).places();
-            int totalTokenCount = response.usageMetadata().totalTokenCount();
-            log.info("[Gemini] 영상 장소 추론 성공: model={}, placeCount={}, totalTokenCount={}",
-                    modelName, places.size(), totalTokenCount);
-            return GeminiVideoPlaceInferenceResponse.success(places, modelName, totalTokenCount);
-        } catch (Exception e) {
-            log.warn("[Gemini] 영상 장소 추론 응답 파싱 실패: model={}, message={}", modelName, e.getMessage());
-            return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName);
+    private GeminiVideoPlaceInferenceResponse parseResponse(GeminiGenerateContentResponse response, String modelName,
+                                                            String youtubeUrl) {
+        if (response == null || response.extractResponseText().isEmpty()) {
+            String emptyReason = response == null ? "응답 본문 없음" : response.describeEmptyResponse();
+            log.warn("[Gemini] 영상 장소 추론 응답이 비어 있음: model={}, video={}, {}", modelName, youtubeUrl, emptyReason);
+            return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName, "EMPTY_RESPONSE(" + emptyReason + ")");
         }
+
+        String text = response.extractResponseText().get();
+        List<GeminiVideoInferredPlace> places;
+        try {
+            places = objectMapper.readValue(text, GeminiVideoInferredPlaces.class).places();
+        } catch (Exception e) {
+            log.warn("[Gemini] 영상 장소 추론 응답 파싱 실패: model={}, video={}, message={}, text={}",
+                    modelName, youtubeUrl, e.getMessage(), abbreviate(text));
+            return GeminiVideoPlaceInferenceResponse.retryableFailure(modelName, "PARSE_FAILURE");
+        }
+
+        UsageMetadata usage = response.usageMetadata();
+        log.info("[Gemini] 영상 장소 추론 성공: model={}, modelVersion={}, video={}, placeCount={}, "
+                        + "promptTokens={}, outputTokens={}, thoughtsTokens={}, totalTokens={}",
+                modelName, response.modelVersion(), youtubeUrl, places.size(),
+                usage == null ? null : usage.promptTokenCount(),
+                usage == null ? null : usage.candidatesTokenCount(),
+                usage == null ? null : usage.thoughtsTokenCount(),
+                response.totalTokenCount());
+        return GeminiVideoPlaceInferenceResponse.success(places, modelName, response.totalTokenCount());
+    }
+
+    private static boolean isTimeout(Throwable e) {
+        for (Throwable cause = e; cause != null; cause = cause.getCause()) {
+            if (cause instanceof HttpTimeoutException || cause instanceof SocketTimeoutException) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String readBody(ClientHttpResponse response) {
+        try {
+            return abbreviate(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            return "(응답 본문을 읽지 못함)";
+        }
+    }
+
+    private static String abbreviate(String text) {
+        String oneLine = text.replaceAll("\\s+", " ");
+        return oneLine.length() > LOG_TEXT_MAX_LENGTH ? oneLine.substring(0, LOG_TEXT_MAX_LENGTH) + "..." : oneLine;
     }
 
     private static class QuotaExceededSignal extends RuntimeException {
     }
 
-    private static class RetryableFailureSignal extends RuntimeException {
+    private static class HttpErrorSignal extends RuntimeException {
+
+        private final int statusCode;
+        private final String body;
+
+        HttpErrorSignal(int statusCode, String body) {
+            this.statusCode = statusCode;
+            this.body = body;
+        }
     }
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,6 +30,8 @@ import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse.GeminiI
 
 @ExtendWith(MockitoExtension.class)
 class GeminiVideoPlaceInferenceClientTest {
+
+    private static final String YOUTUBE_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 
     @Mock
     private RestClient geminiRestClient;
@@ -157,12 +161,66 @@ class GeminiVideoPlaceInferenceClientTest {
         assertThat(response.places()).isEmpty();
     }
 
+    @Test
+    @DisplayName("요청이 타임아웃되면 TIMEOUT 사유로 재시도 가능한 실패를 반환한다")
+    void inferPlaces_whenTimeout_returnsRetryableFailureWithTimeoutReason() {
+        // given
+        stubRequestChain();
+        when(responseSpec.body(GeminiGenerateContentResponse.class))
+                .thenThrow(new ResourceAccessException("I/O error", new SocketTimeoutException("Read timed out")));
+
+        // when
+        GeminiVideoPlaceInferenceResponse response =
+                geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash", YOUTUBE_URL);
+
+        // then
+        assertThat(response.status()).isEqualTo(GeminiInferenceStatus.RETRYABLE_FAILURE);
+        assertThat(response.failureReason()).isEqualTo("TIMEOUT");
+    }
+
+    @Test
+    @DisplayName("응답 텍스트가 비어 있으면 생성 종료 사유를 담아 재시도 가능한 실패를 반환한다")
+    void inferPlaces_whenResponseTextEmpty_returnsRetryableFailureWithFinishReason() {
+        // given
+        stubRequestChain();
+        GeminiGenerateContentResponse.Candidate blockedCandidate =
+                new GeminiGenerateContentResponse.Candidate(null, "SAFETY");
+        when(responseSpec.body(GeminiGenerateContentResponse.class))
+                .thenReturn(new GeminiGenerateContentResponse(List.of(blockedCandidate), null, "gemini-3.8-flash", null));
+
+        // when
+        GeminiVideoPlaceInferenceResponse response =
+                geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash", YOUTUBE_URL);
+
+        // then
+        assertThat(response.status()).isEqualTo(GeminiInferenceStatus.RETRYABLE_FAILURE);
+        assertThat(response.failureReason()).startsWith("EMPTY_RESPONSE").contains("finishReason=SAFETY");
+    }
+
+    @Test
+    @DisplayName("응답이 스키마와 다른 형태라 파싱에 실패하면 PARSE_FAILURE 사유로 재시도 가능한 실패를 반환한다")
+    void inferPlaces_whenParseFails_returnsRetryableFailureWithParseFailureReason() {
+        // given
+        stubRequestChain();
+        when(responseSpec.body(GeminiGenerateContentResponse.class))
+                .thenReturn(buildGeminiResponse("not a json", 10));
+
+        // when
+        GeminiVideoPlaceInferenceResponse response =
+                geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash", YOUTUBE_URL);
+
+        // then
+        assertThat(response.status()).isEqualTo(GeminiInferenceStatus.RETRYABLE_FAILURE);
+        assertThat(response.failureReason()).isEqualTo("PARSE_FAILURE");
+    }
+
     private GeminiGenerateContentResponse buildGeminiResponse(String innerJsonText, int totalTokenCount) {
         GeminiGenerateContentResponse.Part part = new GeminiGenerateContentResponse.Part(innerJsonText);
         GeminiGenerateContentResponse.Content content = new GeminiGenerateContentResponse.Content(List.of(part));
-        GeminiGenerateContentResponse.Candidate candidate = new GeminiGenerateContentResponse.Candidate(content);
+        GeminiGenerateContentResponse.Candidate candidate =
+                new GeminiGenerateContentResponse.Candidate(content, "STOP");
         GeminiGenerateContentResponse.UsageMetadata usageMetadata =
-                new GeminiGenerateContentResponse.UsageMetadata(totalTokenCount);
-        return new GeminiGenerateContentResponse(List.of(candidate), usageMetadata, "gemini-3.8-flash");
+                new GeminiGenerateContentResponse.UsageMetadata(null, null, null, totalTokenCount);
+        return new GeminiGenerateContentResponse(List.of(candidate), usageMetadata, "gemini-3.8-flash", null);
     }
 }

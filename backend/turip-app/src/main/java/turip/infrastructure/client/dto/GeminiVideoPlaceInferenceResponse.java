@@ -9,12 +9,16 @@ import java.util.List;
  * @param places 추론된 장소 목록 (실패 시 빈 리스트)
  * @param modelName 이 결과를 만든(또는 시도한) 모델명
  * @param totalTokenCount 이 호출에서 사용된 전체 토큰 수, 실패 시 null
+ * @param failureReason 실패 사유 요약(예: "HTTP 503", "TIMEOUT", "EMPTY_RESPONSE"), 성공 시 null
+ * @param elapsedMs 이 호출에 걸린 시간(ms)
  */
 public record GeminiVideoPlaceInferenceResponse(
         GeminiInferenceStatus status,
         List<GeminiVideoInferredPlace> places,
         String modelName,
-        Integer totalTokenCount
+        Integer totalTokenCount,
+        String failureReason,
+        long elapsedMs
 ) {
 
     /**
@@ -29,17 +33,25 @@ public record GeminiVideoPlaceInferenceResponse(
     }
 
     public static GeminiVideoPlaceInferenceResponse success(
-            List<GeminiVideoInferredPlace> places, String modelName, int totalTokenCount
+            List<GeminiVideoInferredPlace> places, String modelName, Integer totalTokenCount
     ) {
-        return new GeminiVideoPlaceInferenceResponse(GeminiInferenceStatus.SUCCESS, places, modelName, totalTokenCount);
+        return new GeminiVideoPlaceInferenceResponse(
+                GeminiInferenceStatus.SUCCESS, places, modelName, totalTokenCount, null, 0);
     }
 
     public static GeminiVideoPlaceInferenceResponse quotaExceeded(String modelName) {
-        return new GeminiVideoPlaceInferenceResponse(GeminiInferenceStatus.QUOTA_EXCEEDED, List.of(), modelName, null);
+        return new GeminiVideoPlaceInferenceResponse(
+                GeminiInferenceStatus.QUOTA_EXCEEDED, List.of(), modelName, null, "HTTP 429", 0);
     }
 
-    public static GeminiVideoPlaceInferenceResponse retryableFailure(String modelName) {
-        return new GeminiVideoPlaceInferenceResponse(GeminiInferenceStatus.RETRYABLE_FAILURE, List.of(), modelName, null);
+    public static GeminiVideoPlaceInferenceResponse retryableFailure(String modelName, String failureReason) {
+        return new GeminiVideoPlaceInferenceResponse(
+                GeminiInferenceStatus.RETRYABLE_FAILURE, List.of(), modelName, null, failureReason, 0);
+    }
+
+    public GeminiVideoPlaceInferenceResponse withElapsedMs(long elapsedMs) {
+        return new GeminiVideoPlaceInferenceResponse(
+                status, places, modelName, totalTokenCount, failureReason, elapsedMs);
     }
 
     public boolean isSuccess() {

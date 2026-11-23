@@ -62,7 +62,7 @@ class GeminiVideoPlaceInferenceServiceTest {
         GeminiVideoPlaceInferenceResponse successResponse =
                 GeminiVideoPlaceInferenceResponse.success(places, "gemini-3.7-flash", 1000);
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.8-flash"), eq(youtubeUrl)))
-                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.8-flash"));
+                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.8-flash", "HTTP 503"));
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.7-flash"), eq(youtubeUrl)))
                 .thenReturn(successResponse);
 
@@ -83,9 +83,9 @@ class GeminiVideoPlaceInferenceServiceTest {
         GeminiVideoPlaceInferenceResponse successResponse =
                 GeminiVideoPlaceInferenceResponse.success(places, "gemini-3.5-flash-lite", 1000);
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.8-flash"), eq(youtubeUrl)))
-                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.8-flash"));
+                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.8-flash", "HTTP 503"));
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.7-flash"), eq(youtubeUrl)))
-                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.7-flash"));
+                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.7-flash", "HTTP 503"));
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.5-flash-lite"), eq(youtubeUrl)))
                 .thenReturn(successResponse);
 
@@ -121,11 +121,11 @@ class GeminiVideoPlaceInferenceServiceTest {
     void inferPlaces_whenAllModelsFail_returnsLastFailureResponse() {
         // given
         GeminiVideoPlaceInferenceResponse lastFailure =
-                GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.5-flash-lite");
+                GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.5-flash-lite", "HTTP 503");
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.8-flash"), eq(youtubeUrl)))
-                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.8-flash"));
+                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.8-flash", "HTTP 503"));
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.7-flash"), eq(youtubeUrl)))
-                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.7-flash"));
+                .thenReturn(GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.7-flash", "HTTP 503"));
         when(geminiVideoPlaceInferenceClient.inferPlaces(eq("gemini-3.5-flash-lite"), eq(youtubeUrl)))
                 .thenReturn(lastFailure);
 

@@ -57,7 +57,7 @@ class AdminPlaceSuggestionServiceTest {
     void getSuggestions_whenGeminiFails_returnsEmptySuggestionsWithNullTokenCount() {
         // given
         GeminiVideoPlaceInferenceResponse geminiResponse =
-                GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.5-flash-lite");
+                GeminiVideoPlaceInferenceResponse.retryableFailure("gemini-3.5-flash-lite", "HTTP 503");
         when(geminiVideoPlaceInferenceService.inferPlaces(videoUrl)).thenReturn(geminiResponse);
 
         // when
