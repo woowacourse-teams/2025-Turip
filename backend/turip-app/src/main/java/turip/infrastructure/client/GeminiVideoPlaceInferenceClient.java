@@ -1,6 +1,5 @@
 package turip.infrastructure.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import turip.infrastructure.client.dto.GeminiGenerateContentResponse;
 import turip.infrastructure.client.dto.GeminiVideoInferredPlace;
+import turip.infrastructure.client.dto.GeminiVideoInferredPlaces;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
 
 /**
@@ -38,10 +38,6 @@ public class GeminiVideoPlaceInferenceClient {
             - 숙소는 같은 장소가 여러 구간에 등장해도 한 항목으로 합치고, 가장 먼저 등장한 시점을 timeSeconds로 기록하라.
             - 숙소가 아닌 장소(식당, 카페, 관광지, 액티비티 장소 등)는 같은 장소가 여러 구간에 다시 등장하면 각각을 별도 항목으로 남기고, 그때그때 등장한 시점을 timeSeconds로 기록하라.
             - 장소가 아닌 구간(인트로, 이동 중 차 안 등)은 포함하지 마라.
-            
-            아래 JSON 배열 스키마로만 응답하라. 다른 설명 텍스트는 포함하지 마라.
-            [{"placeName": "장소명", "confidence": 0부터 100 사이 정수, "timeSeconds": 처음 등장한 시점(초), "evidence": "판단 근거 서술"}]
-            장소를 하나도 찾을 수 없으면 [] 로 응답하라.
             """;
 
     private final RestClient restClient;
@@ -99,17 +95,20 @@ public class GeminiVideoPlaceInferenceClient {
 
         return Map.of(
                 "contents", List.of(Map.of("parts", List.of(fileDataPart, textPart))),
-                "generationConfig", Map.of("responseMimeType", "application/json")
+                "generationConfig", Map.of(
+                        "responseFormat", Map.of("text", Map.of(
+                                "mimeType", "APPLICATION_JSON",
+                                "schema", GeminiVideoInferredPlaces.jsonSchema()
+                        ))
+                )
         );
     }
 
     private GeminiVideoPlaceInferenceResponse parseResponse(GeminiGenerateContentResponse response, String modelName) {
         try {
             String text = response.extractResponseText().orElseThrow();
-            List<GeminiVideoInferredPlace> places = objectMapper.readValue(
-                    text, new TypeReference<List<GeminiVideoInferredPlace>>() {
-                    }
-            );
+            List<GeminiVideoInferredPlace> places =
+                    objectMapper.readValue(text, GeminiVideoInferredPlaces.class).places();
             int totalTokenCount = response.usageMetadata().totalTokenCount();
             log.info("[Gemini] 영상 장소 추론 성공: model={}, placeCount={}, totalTokenCount={}",
                     modelName, places.size(), totalTokenCount);

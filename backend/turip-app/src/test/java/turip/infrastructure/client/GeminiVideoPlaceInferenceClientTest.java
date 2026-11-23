@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import turip.infrastructure.client.dto.GeminiGenerateContentResponse;
+import turip.infrastructure.client.dto.GeminiVideoInferredPlaces;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
 import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse.GeminiInferenceStatus;
 
@@ -75,7 +77,7 @@ class GeminiVideoPlaceInferenceClientTest {
         // given
         stubRequestChain();
         String innerJson = """
-                [{"placeName":"해운대 해수욕장","confidence":95,"timeSeconds":330,"evidence":"자막 확인"}]""";
+                {"places":[{"placeName":"해운대 해수욕장","confidence":95,"timeSeconds":330,"evidence":"자막 확인"}]}""";
         GeminiGenerateContentResponse mockResponse = buildGeminiResponse(innerJson, 1234);
         when(responseSpec.body(GeminiGenerateContentResponse.class)).thenReturn(mockResponse);
 
@@ -98,7 +100,7 @@ class GeminiVideoPlaceInferenceClientTest {
     void inferPlaces_sendsApiKeyViaHeaderNotQueryParam() {
         // given
         stubRequestChain();
-        when(responseSpec.body(GeminiGenerateContentResponse.class)).thenReturn(buildGeminiResponse("[]", 10));
+        when(responseSpec.body(GeminiGenerateContentResponse.class)).thenReturn(buildGeminiResponse("{\"places\":[]}", 10));
 
         // when
         geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash", "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
@@ -112,6 +114,47 @@ class GeminiVideoPlaceInferenceClientTest {
         assertThat(requestUri.toString())
                 .isEqualTo("https://test.gemini.com/gemini-3.8-flash:generateContent")
                 .doesNotContain("test-key");
+    }
+
+    @Test
+    @DisplayName("응답 JSON Schema를 요청의 responseFormat에 담아 Structured outputs로 요청한다")
+    @SuppressWarnings("unchecked")
+    void inferPlaces_requestsStructuredOutputWithSchema() {
+        // given
+        stubRequestChain();
+        when(responseSpec.body(GeminiGenerateContentResponse.class))
+                .thenReturn(buildGeminiResponse("{\"places\":[]}", 10));
+
+        // when
+        geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash", "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+
+        // then
+        ArgumentCaptor<Object> bodyCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(requestBodySpec).body(bodyCaptor.capture());
+        Map<String, Object> body = (Map<String, Object>) bodyCaptor.getValue();
+        Map<String, Object> generationConfig = (Map<String, Object>) body.get("generationConfig");
+        Map<String, Object> responseFormat = (Map<String, Object>) generationConfig.get("responseFormat");
+        assertThat((Map<String, Object>) responseFormat.get("text"))
+                .containsEntry("mimeType", "APPLICATION_JSON")
+                .containsEntry("schema", GeminiVideoInferredPlaces.jsonSchema());
+    }
+
+    @Test
+    @DisplayName("응답의 places가 빈 배열이면 빈 장소 목록으로 성공 처리한다")
+    void inferPlaces_withEmptyPlaces_returnsSuccessWithEmptyList() {
+        // given
+        stubRequestChain();
+        when(responseSpec.body(GeminiGenerateContentResponse.class))
+                .thenReturn(buildGeminiResponse("{\"places\":[]}", 10));
+
+        // when
+        GeminiVideoPlaceInferenceResponse response =
+                geminiVideoPlaceInferenceClient.inferPlaces("gemini-3.8-flash",
+                        "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+
+        // then
+        assertThat(response.status()).isEqualTo(GeminiInferenceStatus.SUCCESS);
+        assertThat(response.places()).isEmpty();
     }
 
     private GeminiGenerateContentResponse buildGeminiResponse(String innerJsonText, int totalTokenCount) {
