@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
+import turip.controller.dto.response.PlaceSuggestionResponse;
 import turip.place.controller.dto.response.PlaceResponse;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchType;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminPlaceService;
+import turip.service.AdminPlaceSuggestionService;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +22,13 @@ import turip.service.AdminPlaceService;
 public class AdminPlaceController {
 
     private final AdminPlaceService adminPlaceService;
+    private final AdminPlaceSuggestionService adminPlaceSuggestionService;
+
+    @GetMapping("/suggestions")
+    public ResponseEntity<PlaceSuggestionResponse> getPlaceSuggestions(@RequestParam String url) {
+        PlaceSuggestionResponse response = adminPlaceSuggestionService.getSuggestions(url);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/search")
     public ResponseEntity<PlaceSearchResponse> search(
