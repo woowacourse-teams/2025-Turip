@@ -24,6 +24,8 @@ import turip.infrastructure.client.dto.GeminiVideoPlaceInferenceResponse;
 @Component
 public class GeminiVideoPlaceInferenceClient {
 
+    private static final String API_KEY_HEADER = "x-goog-api-key";
+
     private static final double FPS = 0.5;
 
     private static final String PROMPT = """
@@ -65,8 +67,8 @@ public class GeminiVideoPlaceInferenceClient {
             response = restClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/" + modelName + ":generateContent")
-                            .queryParam("key", geminiApiKey)
                             .build())
+                    .header(API_KEY_HEADER, geminiApiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
