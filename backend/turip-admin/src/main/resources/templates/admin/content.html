@@ -628,7 +628,9 @@
         topRow.className = 'd-flex justify-content-between align-items-center';
 
         const nameSpan = document.createElement('span');
-        nameSpan.innerHTML = `<b>${item.placeName}</b>`;
+        const nameBold = document.createElement('b');
+        nameBold.textContent = item.placeName;
+        nameSpan.appendChild(nameBold);
 
         const rightSide = document.createElement('div');
         rightSide.className = 'd-flex align-items-center gap-2';
