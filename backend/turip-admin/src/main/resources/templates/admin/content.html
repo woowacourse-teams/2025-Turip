@@ -537,11 +537,31 @@
     function loadAiSuggestionCache(videoUrl) {
         try {
             const raw = localStorage.getItem(aiSuggestionCacheKey(videoUrl));
-            return raw ? JSON.parse(raw) : null;
+            const cached = raw ? JSON.parse(raw) : null;
+            // 실패 결과(또는 상태 필드가 없던 이전 버전의 빈 결과)는 저장된 결과로 보여주지 않는다
+            if (!cached || !isSuccessfulAiSuggestion(cached)) {
+                return null;
+            }
+            return cached;
         } catch (e) {
             console.warn('AI 추천 캐시 로드 실패:', e);
             return null;
         }
+    }
+
+    function isSuccessfulAiSuggestion(data) {
+        if (data.status) {
+            return data.status === 'SUCCESS';
+        }
+        return Array.isArray(data.suggestions) && data.suggestions.length > 0;
+    }
+
+    function showAiSuggestionNotice(message, isFailure) {
+        const empty = document.getElementById('aiSuggestionEmpty');
+        empty.textContent = message;
+        empty.classList.toggle('alert-secondary', !isFailure);
+        empty.classList.toggle('alert-warning', isFailure);
+        empty.classList.remove('d-none');
     }
 
     function applyAiSuggestionData(data, fromCache = false) {
@@ -563,8 +583,17 @@
 
         lastAiSuggestions = data.suggestions || [];
 
+        if (data.status && data.status !== 'SUCCESS') {
+            const message = data.status === 'QUOTA_EXCEEDED'
+                ? 'AI 사용량 한도를 초과했어요. 잠시 후 다시 시도해주세요.'
+                : 'AI 장소 추천에 실패했어요. 잠시 후 다시 시도하거나 영상을 직접 보며 검색해주세요.';
+            showAiSuggestionNotice(message, true);
+            hint.classList.add('d-none');
+            return;
+        }
+
         if (lastAiSuggestions.length === 0) {
-            empty.classList.remove('d-none');
+            showAiSuggestionNotice('추천할 장소를 찾지 못했어요. 영상을 직접 보며 검색해주세요.', false);
             hint.classList.add('d-none');
             return;
         }
@@ -595,12 +624,14 @@
             const res = await authFetch(`/api/v1/admin/places/suggestions?url=${encodeURIComponent(videoUrl)}`);
             const data = await res.json();
 
-            saveAiSuggestionCache(videoUrl, data);
+            if (isSuccessfulAiSuggestion(data)) {
+                saveAiSuggestionCache(videoUrl, data);
+            }
             applyAiSuggestionData(data);
         } catch (e) {
+            // authFetch는 실패 응답(4xx, 5xx)이면 서버의 오류 메시지로 예외를 던진다
             loading.classList.add('d-none');
-            empty.classList.remove('d-none');
-            empty.textContent = 'AI 추천을 불러오지 못했습니다. 영상을 직접 보며 검색해주세요.';
+            showAiSuggestionNotice(`AI 추천을 불러오지 못했어요. ${e.message}`, true);
             console.error('AI 장소 추천 실패:', e);
         } finally {
             triggerBtn.disabled = false;

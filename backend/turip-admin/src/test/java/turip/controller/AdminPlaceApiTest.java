@@ -23,6 +23,7 @@ import turip.account.domain.Role;
 import turip.container.TestContainerConfig;
 import turip.controller.dto.response.PlaceSuggestionResponse;
 import turip.controller.dto.response.PlaceSuggestionResponse.PlaceSuggestionItem;
+import turip.controller.dto.response.PlaceSuggestionResponse.PlaceSuggestionStatus;
 import turip.service.AdminPlaceSuggestionService;
 import turip.util.helper.TestDataHelper;
 
@@ -139,7 +140,7 @@ class AdminPlaceApiTest extends TestContainerConfig {
         void getPlaceSuggestions_returnsSuggestionList() {
             // given
             PlaceSuggestionResponse response = new PlaceSuggestionResponse(
-                    "gemini-3.8-flash", 1234,
+                    PlaceSuggestionStatus.SUCCESS, "gemini-3.8-flash", 1234,
                     List.of(new PlaceSuggestionItem("해운대", 95, 330, "자막 확인"))
             );
             when(adminPlaceSuggestionService.getSuggestions(anyString())).thenReturn(response);
@@ -150,6 +151,7 @@ class AdminPlaceApiTest extends TestContainerConfig {
                     .when().get("/api/v1/admin/places/suggestions")
                     .then()
                     .statusCode(200)
+                    .body("status", is("SUCCESS"))
                     .body("modelName", is("gemini-3.8-flash"))
                     .body("totalTokenCount", is(1234))
                     .body("suggestions[0].placeName", is("해운대"))
@@ -158,10 +160,11 @@ class AdminPlaceApiTest extends TestContainerConfig {
         }
 
         @Test
-        @DisplayName("Gemini가 전부 실패해도 200과 빈 추천 리스트를 응답한다")
+        @DisplayName("Gemini가 전부 실패해도 200과 실패 상태, 빈 추천 리스트를 응답한다")
         void getPlaceSuggestions_whenAllModelsFail_returnsEmptyList() {
             // given
-            PlaceSuggestionResponse response = new PlaceSuggestionResponse("gemini-3.5-flash-lite", null, List.of());
+            PlaceSuggestionResponse response = new PlaceSuggestionResponse(
+                    PlaceSuggestionStatus.FAILED, "gemini-3.5-flash-lite", null, List.of());
             when(adminPlaceSuggestionService.getSuggestions(anyString())).thenReturn(response);
 
             // when & then
@@ -170,6 +173,7 @@ class AdminPlaceApiTest extends TestContainerConfig {
                     .when().get("/api/v1/admin/places/suggestions")
                     .then()
                     .statusCode(200)
+                    .body("status", is("FAILED"))
                     .body("suggestions.size()", is(0));
         }
     }
